@@ -22,6 +22,7 @@ SET(CMAKE_INSTALL_PREFIX "${INSTALL_PREFIX}" CACHE INTERNAL "Prefix prepended to
 SET(SOURCE_FILES
   "devices/tscope_pads.cc"
   "utils/propagate.cc"
+  "utils/assembly.cc"
   )
 
 # Depends on GBL for tracking and ROOT for plotting:
