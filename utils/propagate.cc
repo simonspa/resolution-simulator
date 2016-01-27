@@ -19,7 +19,7 @@ double gblsim::getTheta(double energy, double radlength) {
   // Return the scattering distribution with Theta according to the Highland forumla
   // http://pdg.lbl.gov/2015/reviews/rpp2014-rev-passage-particles-matter.pdf (Equation 32.15)
 
-  // Radiation length in [mm], particle energy in [GeV]
+  // Radiation length fraction with no unit (thickness / rad. length), particle energy in [GeV]
   return (0.0136*sqrt(radlength)/energy*(1+0.038*log(radlength)));
 }
 
@@ -43,7 +43,7 @@ gbl::GblPoint gblsim::getPoint(double dz, double res, TVectorD wscat, bool has_m
   TVectorD scat(2);
   scat.Zero(); // mean is zero
   point.addScatterer(scat, wscat);
-
+  
   // Add measurement if requested:
   if(has_meas) {
     // measurement = residual
@@ -67,4 +67,13 @@ gbl::GblPoint gblsim::getPoint(double dz, double res, TVectorD wscat, bool has_m
 gbl::GblPoint gblsim::getPoint(double dz, TVectorD wscat) {
   // This does not add a measurement - no resultion is given!
   return getPoint(dz,0.0,wscat,false);
+}
+
+gbl::GblPoint gblsim::getMarker(double dz) {
+
+  // Propagate:
+  TMatrixD jacPointToPoint = Jac5(dz);
+  gbl::GblPoint point(jacPointToPoint);
+
+  return point;
 }
