@@ -20,7 +20,8 @@ SET(INSTALL_PREFIX "${PROJECT_SOURCE_DIR}" CACHE PATH "Prefix prepended to insta
 SET(CMAKE_INSTALL_PREFIX "${INSTALL_PREFIX}" CACHE INTERNAL "Prefix prepended to install directories" FORCE)
 
 SET(SOURCE_FILES
-   "devices/tscope_pads.cc"
+  "devices/tscope_pads.cc"
+  "utils/propagate.cc"
   )
 
 # Depends on GBL for tracking and ROOT for plotting:
