@@ -24,7 +24,8 @@ plane::plane(double position, double material, bool measurement, double resoluti
 
 
 telescope::telescope(std::vector<gblsim::plane> planes) :
-  m_listOfPoints()
+  m_listOfPoints(),
+  m_listOfLabels()
 {
   LOG(logINFO) << "Received " << planes.size() << " planes.";
 
@@ -43,6 +44,8 @@ telescope::telescope(std::vector<gblsim::plane> planes) :
   oldpos = pl->m_position;
   // Advance the iterator:
   pl++;
+  // Store plane label:
+  m_listOfLabels.push_back(m_listOfPoints.size());
   LOG(logINFO) << "Added first plane at " << arclength;
 
   // All planes except first:
@@ -73,6 +76,8 @@ telescope::telescope(std::vector<gblsim::plane> planes) :
     }
     // Update position of previous plane:
     oldpos = pl->m_position;
+    // Store plane label:
+    m_listOfLabels.push_back(m_listOfPoints.size());
     LOG(logINFO) << "Added plane at " << arclength;
   }
 

@@ -27,5 +27,6 @@ namespace gblsim {
 
   private:
     std::vector<gbl::GblPoint> m_listOfPoints;
+    std::vector<int> m_listOfLabels;
   };
 }
