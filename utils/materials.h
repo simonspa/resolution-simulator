@@ -9,7 +9,10 @@
   
 // X0 Al = 24.01/2.70 = 8.89 cm
 #define X0_Al 88.9
-  
+
+// X0 Au = 0.3344 cm
+#define X0_Au 3.344
+
 // X0 Cu = 12.86/8.96 = 1.435 cm
 #define X0_Cu 14.35
   
