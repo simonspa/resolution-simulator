@@ -61,7 +61,6 @@ int main(int argc, char* argv[]) {
   //----------------------------------------------------------------------------
   // Build the trajectory through the telescope device:
 
-
   plane pl0(0,analog_plane,true,resolution_analog);
   plane pl1(20.32,analog_plane,true,resolution_analog);
 
@@ -80,8 +79,30 @@ int main(int argc, char* argv[]) {
   planes.push_back(pl3);
 
   telescope mytel(planes);
+  LOG(logRESULT) << "Four-plane tracking:";
   LOG(logRESULT) << "Track resolution at PAD1: " << mytel.getResolution(2);
   LOG(logRESULT) << "Track resolution at PAD2: " << mytel.getResolution(3);
 
+
+  //----------------------------------------------------------------------------
+  // Build the trajectory through the telescope device:
+
+  plane apl0(0,analog_plane,true,resolution_analog);
+  plane apl1(20.32,analog_plane,true,resolution_analog);
+
+  plane apad1(32,diamond_pad,false);
+  plane apad2(51,diamond_pad,false);
+
+  std::vector<plane> aplanes;
+  aplanes.push_back(pl0);
+  aplanes.push_back(pl1);
+  aplanes.push_back(pad1);
+  aplanes.push_back(pad2);
+
+  telescope amytel(aplanes);
+  LOG(logRESULT) << "Two-plane tracking:";
+  LOG(logRESULT) << "Track resolution at PAD1: " << amytel.getResolution(2);
+  LOG(logRESULT) << "Track resolution at PAD2: " << amytel.getResolution(3);
+  
   return 0;
 }
