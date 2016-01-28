@@ -87,7 +87,34 @@ telescope::telescope(std::vector<gblsim::plane> planes) :
 GblTrajectory telescope::getTrajectory() {
 
   GblTrajectory traj(m_listOfPoints, 0);
-  traj.printPoints();
-
+  IFLOG(logDEBUG) { traj.printPoints(); }
   return traj;
+}
+
+double telescope::getResolution(int plane) {
+
+  GblTrajectory tr = getTrajectory();
+
+  double c2, lw;
+  int ndf;
+
+  tr.fit(c2, ndf, lw);
+  LOG(logDEBUG) << " Fit: Chi2=" << c2 << ", Ndf=" << ndf << ", lostWeight=" << lw;
+  tr.printTrajectory();
+
+  TVectorD aCorr(5);
+  TMatrixDSym aCov(5);
+
+  // Get resolution at position of the DUT:
+  if(plane < m_listOfLabels.size()) {
+    tr.getResults(m_listOfLabels.at(plane), aCorr, aCov);
+  }
+  return sqrt(aCov(3,3))*1E3;
+}
+
+void telescope::printLabels() {
+
+  for(size_t l = 0; l < m_listOfLabels.size(); l++) {
+    LOG(logINFO) << "Plane " << l << " label " << m_listOfLabels.at(l);
+  }
 }

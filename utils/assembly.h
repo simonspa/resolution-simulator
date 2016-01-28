@@ -25,6 +25,10 @@ namespace gblsim {
     // Return the trajectory
     gbl::GblTrajectory getTrajectory();
 
+    // Return the resolution at given plane:
+    double getResolution(int plane);
+
+    void printLabels();
   private:
     std::vector<gbl::GblPoint> m_listOfPoints;
     std::vector<int> m_listOfLabels;
