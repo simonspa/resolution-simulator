@@ -90,6 +90,8 @@ int main(int argc, char* argv[]) {
   resolution_pad1->GetYaxis()->SetRangeUser(0,100);
   resolution_pad1->SetMarkerStyle(20);
   resolution_pad2->SetMarkerStyle(20);
+  resolution_pad1->SetLineColor(kRed+1);
+  resolution_pad2->SetLineColor(kBlack);
   resolution_pad1->SetMarkerColor(kRed+1);
   resolution_pad2->SetMarkerColor(kBlack);
   
