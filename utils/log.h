@@ -194,6 +194,10 @@ typedef uniLog<SetLogOutput> Log;
 
 #define __FILE_NAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
+#define IFLOG(level)							\
+  if (level > unilog::Log::ReportingLevel() || !unilog::SetLogOutput::Stream()) ; \
+  else 
+
 #define LOG(level)				\
   if (level > unilog::Log::ReportingLevel() || !unilog::SetLogOutput::Stream()) ; \
   else unilog::Log().Get(level,__FILE_NAME__,__func__,__LINE__)
