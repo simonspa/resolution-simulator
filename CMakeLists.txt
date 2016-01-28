@@ -20,7 +20,6 @@ SET(INSTALL_PREFIX "${PROJECT_SOURCE_DIR}" CACHE PATH "Prefix prepended to insta
 SET(CMAKE_INSTALL_PREFIX "${INSTALL_PREFIX}" CACHE INTERNAL "Prefix prepended to install directories" FORCE)
 
 SET(SOURCE_FILES
-  "devices/tscope_pads.cc"
   "telescope/propagate.cc"
   "telescope/assembly.cc"
   )
@@ -31,5 +30,8 @@ FIND_PACKAGE(GBL REQUIRED)
 
 INCLUDE_DIRECTORIES(SYSTEM telescope utils ${ROOT_INCLUDE_DIR} ${GBL_INCLUDE_DIR})
 
-ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${ROOT_LIBRARIES} ${GBL_LIBRARY})
+ADD_EXECUTABLE(tpad devices/tscope_pads.cc ${SOURCE_FILES})
+TARGET_LINK_LIBRARIES(tpad ${ROOT_LIBRARIES} ${GBL_LIBRARY})
+
+ADD_EXECUTABLE(tpix devices/tscope_diamondpixel.cc ${SOURCE_FILES})
+TARGET_LINK_LIBRARIES(tpix ${ROOT_LIBRARIES} ${GBL_LIBRARY})
