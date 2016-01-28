@@ -55,13 +55,13 @@ int main() {
 
 
   plane pl0(0,analog_plane,true,resolution_analog);
-  plane pl1(100,analog_plane,true,resolution_analog);
+  plane pl1(20.32,analog_plane,true,resolution_analog);
 
-  plane pad1(200,diamond_pad,false);
-  plane pad2(300,diamond_pad,false);
+  plane pad1(32,diamond_pad,false);
+  plane pad2(51,diamond_pad,false);
     
-  plane pl2(400,analog_plane,true,resolution_analog);
-  plane pl3(500,analog_plane,true,resolution_analog);
+  plane pl2(81.28,analog_plane,true,resolution_analog);
+  plane pl3(101.6,analog_plane,true,resolution_analog);
 
   std::vector<plane> planes;
   planes.push_back(pl0);
