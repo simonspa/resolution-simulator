@@ -17,3 +17,4 @@ Small collection of scripts for simulation of the telescope resolution for the C
   ```
   
 * read the code and adapt to your needs.
+* Add new devices into the `devices` directory

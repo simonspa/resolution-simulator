@@ -21,15 +21,15 @@ SET(CMAKE_INSTALL_PREFIX "${INSTALL_PREFIX}" CACHE INTERNAL "Prefix prepended to
 
 SET(SOURCE_FILES
   "devices/tscope_pads.cc"
-  "utils/propagate.cc"
-  "utils/assembly.cc"
+  "telescope/propagate.cc"
+  "telescope/assembly.cc"
   )
 
 # Depends on GBL for tracking and ROOT for plotting:
 FIND_PACKAGE(ROOT REQUIRED)
 FIND_PACKAGE(GBL REQUIRED)
 
-INCLUDE_DIRECTORIES(SYSTEM utils ${ROOT_INCLUDE_DIR} ${GBL_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(SYSTEM telescope utils ${ROOT_INCLUDE_DIR} ${GBL_INCLUDE_DIR})
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${ROOT_LIBRARIES} ${GBL_LIBRARY})
