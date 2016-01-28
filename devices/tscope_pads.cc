@@ -38,25 +38,9 @@ int main(int argc, char* argv[]) {
   //----------------------------------------------------------------------------
   // Preparation of the particle trajectory:
   
-  // Label for the DUT positions
-  int dut_label_pad1 = 0;
-  int dut_label_pad2 = 0;
-
-  // List of points along the trajectory:
-  std::vector<GblPoint> listOfPoints;
-
-  // Position along the trajectory:
-  double arclength = 0; // Absolute position
-  double distance = 0; // Position relative to last point
-  
   // Telescope properties:
   double analog_plane = 285e-3 / X0_Si + 500e-3 / X0_Si + 700e-3 / X0_PCB;
   double diamond_pad = 20e-3 / X0_Al + 500e-3 / X0_Diamond + 20e-3 / X0_Al;
-
-  // Distance between planes:
-  double dz = 100; // mm
-  double dz_dut = 100; // mm
-
   
   //----------------------------------------------------------------------------
   // Build the trajectory through the telescope device:
