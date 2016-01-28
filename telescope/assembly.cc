@@ -100,7 +100,7 @@ double telescope::getResolution(int plane) {
 
   tr.fit(c2, ndf, lw);
   LOG(logDEBUG) << " Fit: Chi2=" << c2 << ", Ndf=" << ndf << ", lostWeight=" << lw;
-  tr.printTrajectory();
+  IFLOG(logDEBUG) { tr.printTrajectory(); }
 
   TVectorD aCorr(5);
   TMatrixDSym aCov(5);

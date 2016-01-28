@@ -13,9 +13,7 @@ using namespace gbl;
 using namespace gblsim;
 using namespace unilog;
 
-int main() {
-
-  Log::ReportingLevel() = Log::FromString("DEBUG5");
+int main(int argc, char* argv[]) {
 
   /*
    * Create points on initial trajectory, create trajectory from points,
@@ -26,6 +24,16 @@ int main() {
    * with simple jacobian (quadratic in arc length differences).
    */
 
+  
+  Log::ReportingLevel() = Log::FromString("INFO");
+
+  for (int i = 1; i < argc; i++) {
+    // Setting verbosity:
+    if (std::string(argv[i]) == "-v") { 
+      Log::ReportingLevel() = Log::FromString(std::string(argv[++i]));
+      continue;
+    } 
+  }
   
   //----------------------------------------------------------------------------
   // Preparation of the particle trajectory:
@@ -72,8 +80,6 @@ int main() {
   planes.push_back(pl3);
 
   telescope mytel(planes);
-  mytel.printLabels();
-
   LOG(logRESULT) << "Track resolution at PAD1: " << mytel.getResolution(2);
   LOG(logRESULT) << "Track resolution at PAD2: " << mytel.getResolution(3);
 
