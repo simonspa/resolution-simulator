@@ -42,8 +42,8 @@ int main() {
   double distance = 0; // Position relative to last point
   
   // Telescope properties:
-  double analog_plane = 285e-3 / X0_Si;
-  double diamond_pad = 500e-3 / X0_Diamond;
+  double analog_plane = 285e-3 / X0_Si + 500e-3 / X0_Si + 700e-3 / X0_PCB;
+  double diamond_pad = 20e-3 / X0_Al + 500e-3 / X0_Diamond + 20e-3 / X0_Al;
 
   // Distance between planes:
   double dz = 100; // mm
