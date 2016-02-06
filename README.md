@@ -1,8 +1,10 @@
 Telescope Resolution Simulation
 =====
 
-Calculator class for telescope track resolution using the General Broken Lines formalism
+Calculator class for telescope track resolution using the General Broken Lines formalism.
+
 This small collection of scripts provides a simple interface for the simulation of telescope resolutions including the effects of multiple scattering in the telescope planes and the surrounding air.
+
 
 ### Features
 
@@ -11,8 +13,8 @@ This small collection of scripts provides a simple interface for the simulation 
 * Automatically accounts for air between the telescope planes
 * Automatic placement of the thin scatterers at correct positions
 * Planes ordered automatically in `z` for correct GBL trajectory building
-
 * Radiation length for some common materials are defined in `utils/materials.h`
+
 
 ### Installation
 
@@ -46,5 +48,6 @@ This small collection of scripts provides a simple interface for the simulation 
 
 * All telescope assemblies are stored in the `devices` directory.
 * Take one of the provided examples, adapt it to your needs and add the executable to the `CMakeLists.txt` file in the devices directory in order to compile the executable.
+* Have a look at the `devices/tscope_datura.cc` example for some explanatory comments on how to build the telescope assembly.
 
 ### 
