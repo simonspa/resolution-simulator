@@ -12,7 +12,7 @@ find_path(GBL_INCLUDE_DIR GblPoint.h
 find_library(GBL_LIBRARY NAMES GBL
   HINTS "${GBLPATH}/lib" "${GBLPATH}/cpp/lib" "$ENV{GBLPATH}/lib" "$ENV{GBLPATH}/cpp/lib")
 
-MESSAGE(STATUS "include: ${GBL_INCLUDE_DIR} ${GBL_LIBRARY}")
+MESSAGE(STATUS "GBL: ${GBL_INCLUDE_DIR} ${GBL_LIBRARY}")
 
 #include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set GBL_FOUND to TRUE
@@ -25,6 +25,7 @@ IF(GBL_LIBRARY AND GBL_INCLUDE_DIR)
    MESSAGE(STATUS "Found GBL library and headers.")
 ELSE(GBL_LIBRARY AND GBL_INCLUDE_DIR)
   SET(GBL_FOUND FALSE)
+  MESSAGE(FATAL_ERROR "Could not find GBL library and headers. Please set $GBLPATH.")
 ENDIF(GBL_LIBRARY AND GBL_INCLUDE_DIR)
 
 mark_as_advanced(GBL_LIBRARY GBL_INCLUDE_DIR)

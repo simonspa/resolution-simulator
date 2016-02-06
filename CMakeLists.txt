@@ -7,7 +7,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 ########################################################
 
 # Project name
-PROJECT( ccpsim )
+PROJECT( telressim )
 
 # Setup the build environment
 LIST ( APPEND CMAKE_CXX_FLAGS "-fPIC -O2 -std=c++11" )
@@ -19,7 +19,7 @@ LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake )
 SET(INSTALL_PREFIX "${PROJECT_SOURCE_DIR}" CACHE PATH "Prefix prepended to install directories")
 SET(CMAKE_INSTALL_PREFIX "${INSTALL_PREFIX}" CACHE INTERNAL "Prefix prepended to install directories" FORCE)
 
-SET(SOURCE_FILES
+SET(LIB_SOURCE_FILES
   "telescope/propagate.cc"
   "telescope/assembly.cc"
   )
@@ -30,11 +30,9 @@ FIND_PACKAGE(GBL REQUIRED)
 
 INCLUDE_DIRECTORIES(SYSTEM telescope utils ${ROOT_INCLUDE_DIR} ${GBL_INCLUDE_DIR})
 
-ADD_EXECUTABLE(tpad devices/tscope_pads.cc ${SOURCE_FILES})
-TARGET_LINK_LIBRARIES(tpad ${ROOT_LIBRARIES} ${GBL_LIBRARY})
+# Build the telescope sim library
+ADD_LIBRARY(${PROJECT_NAME} SHARED ${LIB_SOURCE_FILES})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${GBL_LIBRARY})
 
-ADD_EXECUTABLE(tpix devices/tscope_diamondpixel.cc ${SOURCE_FILES})
-TARGET_LINK_LIBRARIES(tpix ${ROOT_LIBRARIES} ${GBL_LIBRARY})
-
-ADD_EXECUTABLE(intrinsic devices/intrinsic.cc ${SOURCE_FILES})
-TARGET_LINK_LIBRARIES(intrinsic ${ROOT_LIBRARIES} ${GBL_LIBRARY})
+# Add subfolder with all telescope devices:
+ADD_SUBDIRECTORY(devices)
