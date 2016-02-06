@@ -41,48 +41,57 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy) :
   std::vector<plane>::iterator pl = planes.begin();
   if(pl->m_measurement) {
     m_listOfPoints.push_back(getPoint(pl->m_position,pl->m_resolution,getScatterer(beam_energy,pl->m_materialbudget)));
+    LOG(logDEBUG) << "Added plane at " << arclength << " (scatterer + measurement)";
   }
   else {
     m_listOfPoints.push_back(getPoint(pl->m_position,getScatterer(beam_energy,pl->m_materialbudget)));
+    LOG(logDEBUG) << "Added plane at " << arclength << " (scatterer)";
   }
   oldpos = pl->m_position;
   // Advance the iterator:
   pl++;
+
   // Store plane label:
   m_listOfLabels.push_back(m_listOfPoints.size());
-  LOG(logDEBUG) << "Added first plane at " << arclength;
 
   // All planes except first:
   for(pl; pl != planes.end(); pl++) {
+
     // Let's first add the air:
     double plane_distance = pl->m_position - oldpos;
     LOG(logDEBUG2) << "Distance to next plane: " << plane_distance;
     
     // Propagate [mm] from 0 to 0.21 = 0.5 - 1/sqrt(12)
     double distance = 0.21 * plane_distance; arclength += distance;
+
     // Add air:
     m_listOfPoints.push_back(getPoint(distance,getScatterer(beam_energy,0.5*plane_distance/X0_Air)));
     LOG(logDEBUG3) << "Added air scat at " << arclength;
+
     // Propagate [mm] 0.58 = from 0.21 to 0.79 = 0.5 + 1/sqrt(12)
     distance = 0.58 * plane_distance; arclength += distance;
+
     // Factor 0.5 for the air as it is split into two scatterers:
     m_listOfPoints.push_back(getPoint(distance,getScatterer(beam_energy,0.5*plane_distance/X0_Air)));
     LOG(logDEBUG3) << "Added air scat at " << arclength;
+
     // Propagate [mm] from 0 to 0.21 = 0.5 - 1/sqrt(12)
     distance = 0.21 * plane_distance; arclength += distance;
     LOG(logDEBUG) << "Added air scatterers.";
     
     if(pl->m_measurement) {
       m_listOfPoints.push_back(getPoint(distance,pl->m_resolution,getScatterer(beam_energy,pl->m_materialbudget)));
+      LOG(logDEBUG) << "Added plane at " << arclength << " (scatterer + measurement)";
     }
     else {
       m_listOfPoints.push_back(getPoint(distance,getScatterer(beam_energy,pl->m_materialbudget)));
+      LOG(logDEBUG) << "Added plane at " << arclength << " (scatterer)";
     }
     // Update position of previous plane:
     oldpos = pl->m_position;
     // Store plane label:
     m_listOfLabels.push_back(m_listOfPoints.size());
-    LOG(logDEBUG) << "Added plane at " << arclength;
+
   }
 
   LOG(logDEBUG) << "Finished building trajectory.";
