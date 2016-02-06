@@ -8,6 +8,10 @@ namespace gblsim {
 
     double position() { return m_position; }
 
+    bool operator < (const plane& pl) const {
+        return (m_position < pl.m_position);
+    }
+
   private:
     bool m_measurement;
     double m_resolution;

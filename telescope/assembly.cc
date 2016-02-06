@@ -4,6 +4,8 @@
 #include "materials.h"
 #include "propagate.h"
 
+#include <algorithm>
+
 using namespace gblsim;
 using namespace unilog;
 using namespace gbl;
@@ -29,7 +31,9 @@ telescope::telescope(std::vector<gblsim::plane> planes) :
 {
   LOG(logINFO) << "Received " << planes.size() << " planes.";
 
-  // FIXME make sure they are ordered in z...
+  // Make sure they are ordered in z by sorting the planes vector:
+  std::sort(planes.begin(),planes.end());
+  
   double arclength = 0;
   double oldpos = 0;
 
