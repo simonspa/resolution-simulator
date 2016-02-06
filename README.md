@@ -50,4 +50,16 @@ This small collection of scripts provides a simple interface for the simulation 
 * Take one of the provided examples, adapt it to your needs and add the executable to the `CMakeLists.txt` file in the devices directory in order to compile the executable.
 * Have a look at the `devices/tscope_datura.cc` example for some explanatory comments on how to build the telescope assembly.
 
-### 
+### Further hints:
+
+* The resolution can only be evaluated at a previously defined plane. This can either be a plane with measurements, a scatterer, or a plane with no material attached. They can be defined as follows:
+
+`gblsim::plane measurement(position, material, TRUE, resolution);` - plane with measurement and scattering material
+
+`gblsim::plane measurement(position, material, FALSE);` - plane with scattering material but no measurement
+
+`gblsim::plane measurement(position, 0, FALSE);` - plane with zero material and no measurement (simple reference point)
+
+
+* The material budget is always given as fractions of radiation lengths. Thus, divide your material thickness by its radiation length, and add up different materials as linear sum.
+* The resolution is always given as intrinsic resolution of the respective sensor in units of micrometer.
