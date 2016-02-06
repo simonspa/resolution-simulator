@@ -34,41 +34,48 @@ int main(int argc, char* argv[]) {
 
   // MIMOSA26 telescope planes consist of 50um silicon plus 2x25um Kapton foil only:
   double MIM26 = 50e-3 / X0_Si + 50e-3 / X0_Kapton;
-  
   // The intrinsic resolution has been measured to be around 3.4um:
   double RES = 3.4e-3;
+
+  // M26  M26  M26      DUT      M26  M26  M26
+  //  |    |    |        |        |    |    |
+  //  |    |    |        |        |    |    |
+  //  |<-->|    |<------>|<------>|    |    |
+  //   DIST      DUT_DIST DUT_DIST
   
+  // Distance between telescope planes in mm:
+  double DIST = 20;
+  // Distance of telescope arms and DUT assembly:
+  double DUT_DIST = 20;
+
   // Beam energy 5 GeV electrons/positrons at DESY:
   double BEAM = 5.0;
 
-  
+
   //----------------------------------------------------------------------------
   // Build the trajectory through the telescope device:
 
-  // Upstream telescope arm:
-  plane pl0(0,MIM26,true,RES);
-  plane pl1(150,MIM26,true,RES);
-  plane pl2(300,MIM26,true,RES);
-
-  // Downstream telescope arm:
-  plane pl3(400,MIM26,true,RES);
-  plane pl4(550,MIM26,true,RES);
-  plane pl5(700,MIM26,true,RES);
-
   // Build a vector of all telescope planes:
   std::vector<plane> datura;
-  datura.push_back(pl0);
-  datura.push_back(pl1);
-  datura.push_back(pl2);
+  double position = 0;
   
-  datura.push_back(pl3);
-  datura.push_back(pl4);
-  datura.push_back(pl5);
+  // Upstream telescope arm:
+  for(int i = 0; i < 3; i++) {
+    datura.push_back(plane(position,MIM26,true,RES));
+    position += DIST;
+  }
 
-  for(double dut_x0 = 0.005; dut_x0 < 15; dut_x0 += 0.1) {
+  // Downstream telescope arm:
+  position = 2*DIST + 2*DUT_DIST;
+  for(int i = 0; i < 3; i++) {
+    datura.push_back(plane(position,MIM26,true,RES));
+    position += DIST;
+  }
+
+  for(double dut_x0 = 0.001; dut_x0 < 0.02; dut_x0 += 0.002) {
 
     // Prepare the DUT (no measurement, just scatterer
-    plane dut(350, dut_x0, false);
+    plane dut(2*DIST+DUT_DIST, dut_x0, false);
 
     // Duplicate the planes vector and add the current DUT:
     std::vector<plane> planes = datura;
