@@ -56,9 +56,9 @@ This small collection of scripts provides a simple interface for the simulation 
 
 `gblsim::plane measurement(position, material, TRUE, resolution);` - plane with measurement and scattering material
 
-`gblsim::plane measurement(position, material, FALSE);` - plane with scattering material but no measurement
+`gblsim::plane scatterer(position, material, FALSE);` - plane with scattering material but no measurement
 
-`gblsim::plane measurement(position, 0, FALSE);` - plane with zero material and no measurement (simple reference point)
+`gblsim::plane reference(position, 0, FALSE);` - plane with zero material and no measurement (simple reference point)
 
 
 * The material budget is always given as fractions of radiation lengths. Thus, divide your material thickness by its radiation length, and add up different materials as linear sum.
