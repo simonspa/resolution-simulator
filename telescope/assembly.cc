@@ -25,7 +25,7 @@ plane::plane(double position, double material, bool measurement, double resoluti
   m_position(position) {}
 
 
-telescope::telescope(std::vector<gblsim::plane> planes) :
+telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy) :
   m_listOfPoints(),
   m_listOfLabels()
 {

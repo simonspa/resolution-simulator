@@ -20,11 +20,12 @@ namespace gblsim {
     double m_position;
 
     friend class telescope;
+
   };
 
   class telescope {
   public:
-    telescope(std::vector<gblsim::plane> planes);
+    telescope(std::vector<gblsim::plane> planes, double beam_energy);
 
     // Return the trajectory
     gbl::GblTrajectory getTrajectory();
