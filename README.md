@@ -61,5 +61,11 @@ This small collection of scripts provides a simple interface for the simulation 
 `gblsim::plane reference(position, 0, FALSE);` - plane with zero material and no measurement (simple reference point)
 
 
-* The material budget is always given as fractions of radiation lengths. Thus, divide your material thickness by its radiation length, and add up different materials as linear sum.
+* The material budget is always given as fractions of radiation lengths. Thus, divide your material thickness by its radiation length, and add up different materials as linear sum, e.g.
+
+  ```
+  // MIMOSA26 telescope planes consist of 50um silicon plus 2x25um Kapton foil:
+  double MIM26 = 50e-3 / X0_Si + 50e-3 / X0_Kapton;
+  ```
+
 * The resolution is always given as intrinsic resolution of the respective sensor in units of micrometer.
