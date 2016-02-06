@@ -1,9 +1,6 @@
 #ifndef CONST_H
 #define CONST_H
 
-// Beam energy in [GeV]
-#define beam_energy 0.250
-
 // Resolution analog planes in [um]
 #define resolution_analog 33e-3
 
