@@ -1,7 +1,5 @@
 // Simon Spannagel (DESY) January 2016
 
-#include "GblTrajectory.h"
-
 #include "assembly.h"
 #include "propagate.h"
 #include "materials.h"
@@ -9,7 +7,6 @@
 #include "log.h"
 
 using namespace std;
-using namespace gbl;
 using namespace gblsim;
 using namespace unilog;
 
@@ -43,6 +40,9 @@ int main(int argc, char* argv[]) {
   double diamond_plane = 40e-3 / X0_Au + 1550e-3 / X0_PCB + 40e-3 / X0_Au + 700e-3 / X0_Si + 500e-3 / X0_Diamond + 10e-3 / X0_Au;
   double digital_plane = 1550e-3 / X0_PCB + 700e-3 / X0_Si + 285e-3 / X0_Si;
 
+  // Beam: 250 MeV Pi at PSI
+  double BEAM = 0.250;
+  
   //----------------------------------------------------------------------------
   // Build the trajectory through the telescope device:
 
@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
   planes.push_back(pl2);
   planes.push_back(pl3);
 
-  telescope mytel(planes);
+  telescope mytel(planes, BEAM);
   LOG(logRESULT) << "Track resolution at Diamond 1: " << mytel.getResolution(2);
   LOG(logRESULT) << "Track resolution at Diamond 2: " << mytel.getResolution(3);
 

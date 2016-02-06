@@ -1,7 +1,5 @@
 // Simon Spannagel (DESY) January 2016
 
-#include "GblTrajectory.h"
-
 #include "TCanvas.h"
 #include "TProfile.h"
 #include "TString.h"
@@ -14,7 +12,6 @@
 #include "log.h"
 
 using namespace std;
-using namespace gbl;
 using namespace gblsim;
 using namespace unilog;
 
@@ -54,6 +51,8 @@ int main(int argc, char* argv[]) {
   double analog_plane = 285e-3 / X0_Si + 500e-3 / X0_Si + 700e-3 / X0_PCB;
   double diamond_pad = 20e-3 / X0_Al + 500e-3 / X0_Diamond + 20e-3 / X0_Al;
 
+  // Beam: 250 MeV Pi at PSI
+  double BEAM = 0.250;
   
   // Loop over possible intrinsic pixel plane resolutions [um]
   for(double resolution = 5; resolution < 55; resolution++) {
@@ -78,7 +77,7 @@ int main(int argc, char* argv[]) {
     planes.push_back(pl2);
     planes.push_back(pl3);
 
-    telescope mytel(planes);
+    telescope mytel(planes,BEAM);
     LOG(logRESULT) << "Intrinsic: " << resolution << " Track PAD1: " << mytel.getResolution(2);
     LOG(logRESULT) << "Intrinsic: " << resolution << " Track PAD2: " << mytel.getResolution(3) << endl;
     resolution_pad1->Fill(resolution,mytel.getResolution(2),1);

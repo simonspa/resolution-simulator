@@ -1,7 +1,5 @@
 // Simon Spannagel (DESY) January 2016
 
-#include "GblTrajectory.h"
-
 #include "assembly.h"
 #include "propagate.h"
 #include "materials.h"
@@ -9,7 +7,6 @@
 #include "log.h"
 
 using namespace std;
-using namespace gbl;
 using namespace gblsim;
 using namespace unilog;
 
@@ -41,6 +38,9 @@ int main(int argc, char* argv[]) {
   // Telescope properties:
   double analog_plane = 285e-3 / X0_Si + 500e-3 / X0_Si + 700e-3 / X0_PCB;
   double diamond_pad = 20e-3 / X0_Al + 500e-3 / X0_Diamond + 20e-3 / X0_Al;
+
+  // Beam: 250 MeV Pi at PSI
+  double BEAM = 0.250;
   
   //----------------------------------------------------------------------------
   // Build the trajectory through the telescope device:
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
   planes.push_back(pl2);
   planes.push_back(pl3);
 
-  telescope mytel(planes);
+  telescope mytel(planes, BEAM);
   LOG(logRESULT) << "Track resolution (X) at PAD1: " << mytel.getResolution(2);
   LOG(logRESULT) << "Track resolution (X) at PAD2: " << mytel.getResolution(3);
 
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
   yplanes.push_back(ypl2);
   yplanes.push_back(ypl3);
 
-  telescope ymytel(yplanes);
+  telescope ymytel(yplanes, BEAM);
   LOG(logRESULT) << "Track resolution (Y) at PAD1: " << ymytel.getResolution(2);
   LOG(logRESULT) << "Track resolution (Y) at PAD2: " << ymytel.getResolution(3);
 
@@ -103,7 +103,7 @@ int main(int argc, char* argv[]) {
   aplanes.push_back(pad1);
   aplanes.push_back(pad2);
 
-  telescope amytel(aplanes);
+  telescope amytel(aplanes, BEAM);
   LOG(logRESULT) << "Track resolution (X) at PAD1: " << amytel.getResolution(2);
   LOG(logRESULT) << "Track resolution (X) at PAD2: " << amytel.getResolution(3);
 
@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
   yaplanes.push_back(ypad1);
   yaplanes.push_back(ypad2);
 
-  telescope yamytel(yaplanes);
+  telescope yamytel(yaplanes, BEAM);
   LOG(logRESULT) << "Track resolution (Y) at PAD1: " << yamytel.getResolution(2);
   LOG(logRESULT) << "Track resolution (Y) at PAD2: " << yamytel.getResolution(3);
 
