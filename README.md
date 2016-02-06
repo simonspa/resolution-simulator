@@ -1,9 +1,20 @@
-COCPITT Telescope Resolution Simulation
+Telescope Resolution Simulation
 =====
 
-Small collection of scripts for simulation of the telescope resolution for the COCPITT high-rate telescope family.
+Calculator class for telescope track resolution using the General Broken Lines formalism
+This small collection of scripts provides a simple interface for the simulation of telescope resolutions including the effects of multiple scattering in the telescope planes and the surrounding air.
 
-### First steps
+### Features
+
+* Error propagation of track extrapolation uncertainty using GBL
+* Includes scattering in material, estimated via the PDG Highland formula
+* Automatically accounts for air between the telescope planes
+* Automatic placement of the thin scatterers at correct positions
+* Planes ordered automatically in `z` for correct GBL trajectory building
+
+* Radiation length for some common materials are defined in `utils/materials.h`
+
+### Installation
 
 * Install and source ROOT
 * Install GBL
@@ -30,6 +41,10 @@ Small collection of scripts for simulation of the telescope resolution for the C
   cmake ..
   make
   ```
-  
-* read the code and adapt to your needs.
-* Add new devices into the `devices` directory
+
+### Prepare your own telescope simulation
+
+* All telescope assemblies are stored in the `devices` directory.
+* Take one of the provided examples, adapt it to your needs and add the executable to the `CMakeLists.txt` file in the devices directory in order to compile the executable.
+
+### 
