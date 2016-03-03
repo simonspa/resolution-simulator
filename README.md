@@ -1,4 +1,4 @@
-Telescope Resolution Simulation
+GBL Track Resolution Calculator
 =====
 
 Calculator class for telescope track resolution using the General Broken Lines formalism.
