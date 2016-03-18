@@ -35,6 +35,7 @@ namespace gblsim {
 
     void printLabels();
   private:
+    double getTotalMaterialBudget(std::vector<gblsim::plane> planes);
     std::vector<gbl::GblPoint> m_listOfPoints;
     std::vector<int> m_listOfLabels;
   };

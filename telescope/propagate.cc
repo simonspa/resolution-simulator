@@ -14,19 +14,19 @@ TMatrixD gblsim::Jac5(double ds) {
   return jac;
 }
 
-double gblsim::getTheta(double energy, double radlength) {
+double gblsim::getTheta(double energy, double radlength, double total_radlength) {
 
   // Return the scattering distribution with Theta according to the Highland forumla
   // http://pdg.lbl.gov/2015/reviews/rpp2014-rev-passage-particles-matter.pdf (Equation 32.15)
 
   // Radiation length fraction with no unit (thickness / rad. length), particle energy in [GeV]
-  return (0.0136*sqrt(radlength)/energy*(1+0.038*log(radlength)));
+  return (0.0136*sqrt(radlength)/energy*(1+0.038*log(total_radlength)));
 }
 
-TVectorD gblsim::getScatterer(double energy, double radlength) {
+TVectorD gblsim::getScatterer(double energy, double radlength, double total_radlength) {
   TVectorD scat(2);
 
-  double theta = getTheta(energy,radlength);
+  double theta = getTheta(energy,radlength,total_radlength);
   scat[0] = 1.0 / (theta*theta);
   scat[1] = 1.0 / (theta*theta);
 

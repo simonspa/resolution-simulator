@@ -37,14 +37,17 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy) :
   double arclength = 0;
   double oldpos = 0;
 
+  // Calculate the total material budget to correctly estimate the scattering:
+  double total_materialbudget = getTotalMaterialBudget(planes);
+  
   // Add first plane:
   std::vector<plane>::iterator pl = planes.begin();
   if(pl->m_measurement) {
-    m_listOfPoints.push_back(getPoint(pl->m_position,pl->m_resolution,getScatterer(beam_energy,pl->m_materialbudget)));
+    m_listOfPoints.push_back(getPoint(pl->m_position,pl->m_resolution,getScatterer(beam_energy,pl->m_materialbudget,total_materialbudget)));
     LOG(logDEBUG) << "Added plane at " << arclength << " (scatterer + measurement)";
   }
   else {
-    m_listOfPoints.push_back(getPoint(pl->m_position,getScatterer(beam_energy,pl->m_materialbudget)));
+    m_listOfPoints.push_back(getPoint(pl->m_position,getScatterer(beam_energy,pl->m_materialbudget,total_materialbudget)));
     LOG(logDEBUG) << "Added plane at " << arclength << " (scatterer)";
   }
   oldpos = pl->m_position;
@@ -65,14 +68,14 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy) :
     double distance = 0.21 * plane_distance; arclength += distance;
 
     // Add air:
-    m_listOfPoints.push_back(getPoint(distance,getScatterer(beam_energy,0.5*plane_distance/X0_Air)));
+    m_listOfPoints.push_back(getPoint(distance,getScatterer(beam_energy,0.5*plane_distance/X0_Air,total_materialbudget)));
     LOG(logDEBUG3) << "Added air scat at " << arclength;
 
     // Propagate [mm] 0.58 = from 0.21 to 0.79 = 0.5 + 1/sqrt(12)
     distance = 0.58 * plane_distance; arclength += distance;
 
     // Factor 0.5 for the air as it is split into two scatterers:
-    m_listOfPoints.push_back(getPoint(distance,getScatterer(beam_energy,0.5*plane_distance/X0_Air)));
+    m_listOfPoints.push_back(getPoint(distance,getScatterer(beam_energy,0.5*plane_distance/X0_Air,total_materialbudget)));
     LOG(logDEBUG3) << "Added air scat at " << arclength;
 
     // Propagate [mm] from 0 to 0.21 = 0.5 - 1/sqrt(12)
@@ -80,11 +83,11 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy) :
     LOG(logDEBUG) << "Added air scatterers.";
     
     if(pl->m_measurement) {
-      m_listOfPoints.push_back(getPoint(distance,pl->m_resolution,getScatterer(beam_energy,pl->m_materialbudget)));
+      m_listOfPoints.push_back(getPoint(distance,pl->m_resolution,getScatterer(beam_energy,pl->m_materialbudget,total_materialbudget)));
       LOG(logDEBUG) << "Added plane at " << arclength << " (scatterer + measurement)";
     }
     else {
-      m_listOfPoints.push_back(getPoint(distance,getScatterer(beam_energy,pl->m_materialbudget)));
+      m_listOfPoints.push_back(getPoint(distance,getScatterer(beam_energy,pl->m_materialbudget,total_materialbudget)));
       LOG(logDEBUG) << "Added plane at " << arclength << " (scatterer)";
     }
     // Update position of previous plane:
@@ -95,6 +98,40 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy) :
   }
 
   LOG(logDEBUG) << "Finished building trajectory.";
+}
+
+double telescope::getTotalMaterialBudget(std::vector<gblsim::plane> planes) {
+
+  LOG(logDEBUG) << "Calculating total material budget in the particle path...";
+
+  double total_materialbudget = 0;
+  std::vector<plane>::iterator p = planes.begin();
+
+  // Add the plane as scatterer:
+  LOG(logDEBUG2) << "Adding x/X0=" << p->m_materialbudget;
+  total_materialbudget += p->m_materialbudget;
+  double oldpos = p->m_position;
+
+  // Advance the iterator:
+  p++;
+
+  for(p; p != planes.end(); p++) {
+    double plane_distance = p->m_position - oldpos;
+
+    // Add the air as scattering material:
+    LOG(logDEBUG2) << "Adding x/X0=" << (plane_distance/X0_Air) << " (air)";
+    total_materialbudget += plane_distance/X0_Air;
+
+    // Add the plane as scatterer:
+    LOG(logDEBUG2) << "Adding x/X0=" << p->m_materialbudget;
+    total_materialbudget += p->m_materialbudget;
+
+    // Update position of previous plane:
+    oldpos = p->m_position;
+  }
+
+  LOG(logDEBUG) << "Total track material budget x/X0=" << total_materialbudget;
+  return total_materialbudget;
 }
 
 GblTrajectory telescope::getTrajectory() {
