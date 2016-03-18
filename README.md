@@ -14,6 +14,7 @@ This small collection of scripts provides a simple interface for the simulation 
 * Automatic placement of the thin scatterers at correct positions
 * Planes ordered automatically in `z` for correct GBL trajectory building
 * Radiation length for some common materials are defined in `utils/materials.h`
+* The scattering is correctly treated by using the total scattering material of the track and weighting the individual scatterer contributions with their respective material budget.
 
 
 ### Installation
