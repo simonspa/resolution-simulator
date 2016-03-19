@@ -103,32 +103,18 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy) :
 double telescope::getTotalMaterialBudget(std::vector<gblsim::plane> planes) {
 
   LOG(logDEBUG) << "Calculating total material budget in the particle path...";
-
   double total_materialbudget = 0;
-  std::vector<plane>::iterator p = planes.begin();
 
-  // Add the plane as scatterer:
-  LOG(logDEBUG2) << "Adding x/X0=" << p->m_materialbudget;
-  total_materialbudget += p->m_materialbudget;
-  double oldpos = p->m_position;
-
-  // Advance the iterator:
-  p++;
-
-  for(p; p != planes.end(); p++) {
-    double plane_distance = p->m_position - oldpos;
-
-    // Add the air as scattering material:
-    LOG(logDEBUG2) << "Adding x/X0=" << (plane_distance/X0_Air) << " (air)";
-    total_materialbudget += plane_distance/X0_Air;
-
-    // Add the plane as scatterer:
+  // Add the planes as scatterer:
+  for(std::vector<plane>::iterator p = planes.begin(); p != planes.end(); p++) {
     LOG(logDEBUG2) << "Adding x/X0=" << p->m_materialbudget;
     total_materialbudget += p->m_materialbudget;
-
-    // Update position of previous plane:
-    oldpos = p->m_position;
   }
+
+  // Add the air as scattering material:
+  double total_distance = (planes.back().m_position - planes.front().m_position);
+  LOG(logDEBUG2) << "Adding x/X0=" << (total_distance/X0_Air) << " (air)";
+  total_materialbudget += total_distance/X0_Air;
 
   LOG(logDEBUG) << "Total track material budget x/X0=" << total_materialbudget;
   return total_materialbudget;
