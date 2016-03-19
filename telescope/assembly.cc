@@ -25,7 +25,8 @@ plane::plane(double position, double material, bool measurement, double resoluti
   m_position(position) {}
 
 
-telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy) :
+telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, double material) :
+  m_volumeMaterial(material),
   m_listOfPoints(),
   m_listOfLabels()
 {
@@ -63,24 +64,32 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy) :
     // Let's first add the air:
     double plane_distance = pl->m_position - oldpos;
     LOG(logDEBUG2) << "Distance to next plane: " << plane_distance;
+    double distance = 0;
     
-    // Propagate [mm] from 0 to 0.21 = 0.5 - 1/sqrt(12)
-    double distance = 0.21 * plane_distance; arclength += distance;
+    // Check if a volume scatterer with radiation length != 0 has been defined:
+    if(m_volumeMaterial > 0.0) {
+      // Propagate [mm] from 0 to 0.21 = 0.5 - 1/sqrt(12)
+      distance = 0.21 * plane_distance; arclength += distance;
 
-    // Add air:
-    m_listOfPoints.push_back(getPoint(distance,getScatterer(beam_energy,0.5*plane_distance/X0_Air,total_materialbudget)));
-    LOG(logDEBUG3) << "Added air scat at " << arclength;
+      // Add volume scatterer:
+      m_listOfPoints.push_back(getPoint(distance,getScatterer(beam_energy,0.5*plane_distance/m_volumeMaterial,total_materialbudget)));
+      LOG(logDEBUG3) << "Added volume scat at " << arclength;
 
-    // Propagate [mm] 0.58 = from 0.21 to 0.79 = 0.5 + 1/sqrt(12)
-    distance = 0.58 * plane_distance; arclength += distance;
+      // Propagate [mm] 0.58 = from 0.21 to 0.79 = 0.5 + 1/sqrt(12)
+      distance = 0.58 * plane_distance; arclength += distance;
 
-    // Factor 0.5 for the air as it is split into two scatterers:
-    m_listOfPoints.push_back(getPoint(distance,getScatterer(beam_energy,0.5*plane_distance/X0_Air,total_materialbudget)));
-    LOG(logDEBUG3) << "Added air scat at " << arclength;
+      // Factor 0.5 for the volume as it is split into two scatterers:
+      m_listOfPoints.push_back(getPoint(distance,getScatterer(beam_energy,0.5*plane_distance/m_volumeMaterial,total_materialbudget)));
+      LOG(logDEBUG3) << "Added volume scat at " << arclength;
 
-    // Propagate [mm] from 0 to 0.21 = 0.5 - 1/sqrt(12)
-    distance = 0.21 * plane_distance; arclength += distance;
-    LOG(logDEBUG) << "Added air scatterers.";
+      // Propagate [mm] from 0 to 0.21 = 0.5 - 1/sqrt(12)
+      distance = 0.21 * plane_distance; arclength += distance;
+      LOG(logDEBUG) << "Added volume scatterers.";
+    }
+    else {
+      // No volume scatterer defined (vacuum), simply propagate to the next plane:
+      distance = plane_distance;
+    }
     
     if(pl->m_measurement) {
       m_listOfPoints.push_back(getPoint(distance,pl->m_resolution,getScatterer(beam_energy,pl->m_materialbudget,total_materialbudget)));
@@ -111,11 +120,13 @@ double telescope::getTotalMaterialBudget(std::vector<gblsim::plane> planes) {
     total_materialbudget += p->m_materialbudget;
   }
 
-  // Add the air as scattering material:
-  double total_distance = (planes.back().m_position - planes.front().m_position);
-  LOG(logDEBUG2) << "Adding x/X0=" << (total_distance/X0_Air) << " (air)";
-  total_materialbudget += total_distance/X0_Air;
-
+  if(m_volumeMaterial > 0.0) {
+    // Add the air as scattering material:
+    double total_distance = (planes.back().m_position - planes.front().m_position);
+    LOG(logDEBUG2) << "Adding x/X0=" << (total_distance/m_volumeMaterial) << " (air)";
+    total_materialbudget += total_distance/m_volumeMaterial;
+  }
+  
   LOG(logDEBUG) << "Total track material budget x/X0=" << total_materialbudget;
   return total_materialbudget;
 }

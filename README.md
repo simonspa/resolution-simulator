@@ -11,6 +11,7 @@ This small collection of scripts provides a simple interface for the simulation 
 * Error propagation of track extrapolation uncertainty using GBL
 * Includes scattering in material, estimated via the PDG Highland formula
 * Automatically accounts for air between the telescope planes
+* Allows to exchange the volume material considered for scattering (Air, vacuum, Helium...)
 * Automatic placement of the thin scatterers at correct positions
 * Planes ordered automatically in `z` for correct GBL trajectory building
 * Radiation length for some common materials are defined in `utils/materials.h`
@@ -69,4 +70,10 @@ This small collection of scripts provides a simple interface for the simulation 
   double MIM26 = 50e-3 / X0_Si + 50e-3 / X0_Kapton;
   ```
 
-* The resolution is always given as intrinsic resolution of the respective sensor in units of micrometer.
+* The resolution should always be given as intrinsic resolution of the respective sensor in units of micrometer.
+
+* The constructor of the telescope class takes the radiation length of the surrounding volume as optional parameter:
+
+`telescope(std::vector<gblsim::plane> planes, double beam_energy, double material = X0_Air);`
+
+It defaults to the radiation length of dry air but can be replaced with other materials or with vacuum (`X0 = 0`) for comparison.

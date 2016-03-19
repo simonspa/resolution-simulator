@@ -1,4 +1,5 @@
 #include "GblTrajectory.h"
+#include "materials.h"
 
 namespace gblsim {
   class plane {
@@ -25,7 +26,7 @@ namespace gblsim {
 
   class telescope {
   public:
-    telescope(std::vector<gblsim::plane> planes, double beam_energy);
+    telescope(std::vector<gblsim::plane> planes, double beam_energy, double material = X0_Air);
 
     // Return the trajectory
     gbl::GblTrajectory getTrajectory();
@@ -35,6 +36,9 @@ namespace gblsim {
 
     void printLabels();
   private:
+    // Radiationlength of the material of the surrounding volume, defaults to dry air:
+    double m_volumeMaterial;
+    
     double getTotalMaterialBudget(std::vector<gblsim::plane> planes);
     std::vector<gbl::GblPoint> m_listOfPoints;
     std::vector<int> m_listOfLabels;
