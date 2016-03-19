@@ -1,5 +1,10 @@
 // Simon Spannagel (DESY) January 2016
 
+#include "TCanvas.h"
+#include "TProfile.h"
+#include "TString.h"
+#include "TFile.h"
+
 #include "assembly.h"
 #include "propagate.h"
 #include "materials.h"
@@ -28,14 +33,20 @@ int main(int argc, char* argv[]) {
       continue;
     } 
   }
-  
+
+  TFile * out = TFile::Open("datura-intrinsic-resolution.root","RECREATE");
+  gDirectory->pwd();
+
+  TCanvas *c1 = new TCanvas("c1","resolution",700,700);
+  TProfile *resolution = new TProfile("resolution"," ",100,0,0.02);
+
   //----------------------------------------------------------------------------
   // Preparation of the telescope and beam properties:
 
   // MIMOSA26 telescope planes consist of 50um silicon plus 2x25um Kapton foil only:
   double MIM26 = 50e-3 / X0_Si + 50e-3 / X0_Kapton;
   // The intrinsic resolution has been measured to be around 3.4um:
-  double RES = 3.4e-3;
+  double RES = 3.25e-3;
 
   // M26  M26  M26      DUT      M26  M26  M26
   //  |    |    |        |        |    |    |
@@ -72,7 +83,7 @@ int main(int argc, char* argv[]) {
     position += DIST;
   }
 
-  for(double dut_x0 = 0.001; dut_x0 < 0.02; dut_x0 += 0.002) {
+  for(double dut_x0 = 0.001; dut_x0 < 0.02; dut_x0 += 0.0001) {
 
     // Prepare the DUT (no measurement, just scatterer
     plane dut(2*DIST+DUT_DIST, dut_x0, false);
@@ -86,7 +97,19 @@ int main(int argc, char* argv[]) {
 
     // Get the resolution at plane-vector position (x):
     LOG(logRESULT) << "Track resolution at DUT with " << dut_x0 << "% X0: " << mytel.getResolution(3);
+    resolution->Fill(dut_x0,mytel.getResolution(3),1);
   }
+
+    c1->cd();
+  resolution->SetTitle("DATURA Track Resolution at DUT;DUT material budget x/{X_0};resolution at DUT #left[#mum#right]");
+  resolution->GetYaxis()->SetRangeUser(1.5,4);
+  resolution->SetMarkerStyle(0);
+  resolution->SetLineColor(kRed+1);
+  resolution->SetLineWidth(2);
+  resolution->SetMarkerColor(kRed+1);
   
+  resolution->Draw();
+  c1->Write();
+
   return 0;
 }
