@@ -24,6 +24,16 @@ namespace gblsim {
 
   };
 
+  class scatterer : public plane {
+  public:
+  scatterer(double position, double material) : plane(position, material, false) {};
+  };
+
+  class reference : public plane {
+  public:
+  reference(double position) : plane(position, 0.0, false) {};
+  };
+    
   class telescope {
   public:
     telescope(std::vector<gblsim::plane> planes, double beam_energy, double material = X0_Air);
