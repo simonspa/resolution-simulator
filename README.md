@@ -77,3 +77,7 @@ This small collection of scripts provides a simple interface for the simulation 
 `telescope(std::vector<gblsim::plane> planes, double beam_energy, double material = X0_Air);`
 
 It defaults to the radiation length of dry air but can be replaced with other materials or with vacuum (`X0 = 0`) for comparison.
+
+### License and Citation
+
+Thi software is published under the terms of the GNU Lesser General Public License v3.0 (LGPLv3). Please refer to the LICENSE.md file for more information.
