@@ -83,5 +83,6 @@ It defaults to the radiation length of dry air but can be replaced with other ma
 
 This software is published under the terms of the GNU Lesser General Public License v3.0 (LGPLv3). Please refer to the LICENSE.md file for more information.
 
-Please cite this software as
+If you use this software for your scientific research, please cite it as
+
 ```S. Spannagel and H. Jansen, GBL Track Resolution Calculator v2.0, 2016. doi:10.5281/zenodo.48795```
