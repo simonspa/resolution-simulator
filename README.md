@@ -1,5 +1,6 @@
 GBL Track Resolution Calculator
 =====
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.48795.svg)](http://dx.doi.org/10.5281/zenodo.48795)
 
 Calculator class for telescope track resolution using the General Broken Lines formalism.
 
@@ -80,4 +81,7 @@ It defaults to the radiation length of dry air but can be replaced with other ma
 
 ### License and Citation
 
-Thi software is published under the terms of the GNU Lesser General Public License v3.0 (LGPLv3). Please refer to the LICENSE.md file for more information.
+This software is published under the terms of the GNU Lesser General Public License v3.0 (LGPLv3). Please refer to the LICENSE.md file for more information.
+
+Please cite this software as
+```S. Spannagel and H. Jansen, GBL Track Resolution Calculator v2.0, 2016. doi:10.5281/zenodo.48795```
