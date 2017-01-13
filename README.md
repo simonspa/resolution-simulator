@@ -26,8 +26,8 @@ This small collection of scripts provides a simple interface for the simulation 
   (from https://www.wiki.terascale.de/index.php/GeneralBrokenLines)
 
   ```
-  svn checkout http://svnsrv.desy.de/public/GeneralBrokenLines/tags/V01-16-04/cpp GeneralBrokenLines
-  cd cpp
+  svn checkout http://svnsrv.desy.de/public/GeneralBrokenLines/tags/V01-18-00/cpp GeneralBrokenLines
+  cd GeneralBrokenLines
   mkdir build && cd build/
   cmake ..
   make && make install
@@ -36,6 +36,11 @@ This small collection of scripts provides a simple interface for the simulation 
 * Export the GBL library path:
   ```
   export GBLPATH=/path/to/gbl/installation
+  ```
+  If you exactly follow the above description for GBL installation, it will simply be
+  ```
+  cd ../
+  export GBLPATH=`pwd`
   ```
   
 * Compile this code:
