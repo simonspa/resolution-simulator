@@ -21,7 +21,9 @@ This small collection of scripts provides a simple interface for the simulation 
 
 ### Installation
 
-* Install and source ROOT
+* Install and source ROOT (from https://root.cern.ch/)
+  Either ROOT5 or ROOT6 will work fine.
+
 * Install GBL
   (from https://www.wiki.terascale.de/index.php/GeneralBrokenLines)
 
