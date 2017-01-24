@@ -111,5 +111,7 @@ int main(int argc, char* argv[]) {
   resolution->Draw();
   c1->Write();
 
+  // Write result to file
+  out->Write();
   return 0;
 }
