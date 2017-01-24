@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
     } 
   }
 
-  TFile * out = TFile::Open("datura-intrinsic-resolution.root","RECREATE");
+  TFile * out = TFile::Open("datura-resolution.root","RECREATE");
   gDirectory->pwd();
 
   TCanvas *c1 = new TCanvas("c1","resolution",700,700);
@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
 
   // MIMOSA26 telescope planes consist of 50um silicon plus 2x25um Kapton foil only:
   double MIM26 = 50e-3 / X0_Si + 50e-3 / X0_Kapton;
-  // The intrinsic resolution has been measured to be around 3.4um:
+  // The intrinsic resolution has been measured to be around 3.25um:
   double RES = 3.25e-3;
 
   // M26  M26  M26      DUT      M26  M26  M26
@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
     position += DIST;
   }
 
-  for(double dut_x0 = 0.001; dut_x0 < 0.02; dut_x0 += 0.0001) {
+  for(double dut_x0 = 0.001; dut_x0 < 0.05; dut_x0 += 0.0001) {
 
     // Prepare the DUT (no measurement, just scatterer
     plane dut(2*DIST+DUT_DIST, dut_x0, false);
@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
   }
 
     c1->cd();
-  resolution->SetTitle("DATURA Track Resolution at DUT;DUT material budget x/{X_0};resolution at DUT #left[#mum#right]");
+  resolution->SetTitle("DATURA Track Resolution at DUT;DUT material budget x/X_{0};resolution at DUT #left[#mum#right]");
   resolution->GetYaxis()->SetRangeUser(1.5,4);
   resolution->SetMarkerStyle(0);
   resolution->SetLineColor(kRed+1);
