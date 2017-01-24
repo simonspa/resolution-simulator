@@ -44,9 +44,9 @@ int main(int argc, char* argv[]) {
   // Preparation of the telescope and beam properties:
 
   // MIMOSA26 telescope planes consist of 50um silicon plus 2x25um Kapton foil only:
-  double MIM26 = 50e-3 / X0_Si + 50e-3 / X0_Kapton;
+  double MIM26 = 55e-3 / X0_Si + 50e-3 / X0_Kapton;
   // The intrinsic resolution has been measured to be around 3.25um:
-  double RES = 3.25e-3;
+  double RES = 3.24e-3;
 
   // M26  M26  M26      DUT      M26  M26  M26
   //  |    |    |        |        |    |    |
