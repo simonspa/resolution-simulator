@@ -21,13 +21,14 @@ This small collection of scripts provides a simple interface for the simulation 
 
 ### Installation
 
-* Install and source ROOT
+* Install and source ROOT (from https://root.cern.ch/), either ROOT5 or ROOT6 will work fine.
+
 * Install GBL
   (from https://www.wiki.terascale.de/index.php/GeneralBrokenLines)
 
   ```
-  svn checkout http://svnsrv.desy.de/public/GeneralBrokenLines/tags/V01-16-04/cpp GeneralBrokenLines
-  cd cpp
+  svn checkout http://svnsrv.desy.de/public/GeneralBrokenLines/tags/V01-18-00/cpp GeneralBrokenLines
+  cd GeneralBrokenLines
   mkdir build && cd build/
   cmake ..
   make && make install
@@ -37,15 +38,20 @@ This small collection of scripts provides a simple interface for the simulation 
   ```
   export GBLPATH=/path/to/gbl/installation
   ```
+  If you exactly follow the above description for GBL installation, it will simply be
+  ```
+  cd ../
+  export GBLPATH=`pwd`
+  ```
   
 * Compile this code:
 
   ```
-  mkdir build
-  cd build
+  mkdir build && cd build
   cmake ..
   make
   ```
+  All binaries are now in the build directory under `build/devices/`
 
 ### Prepare your own telescope simulation
 
@@ -53,15 +59,15 @@ This small collection of scripts provides a simple interface for the simulation 
 * Take one of the provided examples, adapt it to your needs and add the executable to the `CMakeLists.txt` file in the devices directory in order to compile the executable.
 * Have a look at the `devices/tscope_datura.cc` example for some explanatory comments on how to build the telescope assembly.
 
-### Further hints:
+### Further instructions and hints
 
 * The resolution can only be evaluated at a previously defined plane. This can either be a plane with measurements, a scatterer, or a plane with no material attached. They can be defined as follows:
 
-`gblsim::plane measurement(position, material, TRUE, resolution);` - plane with measurement and scattering material
+  `gblsim::plane measurement(position, material, TRUE, resolution);` - plane with measurement and scattering material
 
-`gblsim::plane scatterer(position, material, FALSE);` - plane with scattering material but no measurement
+  `gblsim::plane scatterer(position, material, FALSE);` - plane with scattering material but no measurement
 
-`gblsim::plane reference(position, 0, FALSE);` - plane with zero material and no measurement (simple reference point)
+  `gblsim::plane reference(position, 0, FALSE);` - plane with zero material and no measurement (simple reference point)
 
 
 * The material budget is always given as fractions of radiation lengths. Thus, divide your material thickness by its radiation length, and add up different materials as linear sum, e.g.
@@ -75,9 +81,9 @@ This small collection of scripts provides a simple interface for the simulation 
 
 * The constructor of the telescope class takes the radiation length of the surrounding volume as optional parameter:
 
-`telescope(std::vector<gblsim::plane> planes, double beam_energy, double material = X0_Air);`
+  `telescope(std::vector<gblsim::plane> planes, double beam_energy, double material = X0_Air);`
 
-It defaults to the radiation length of dry air but can be replaced with other materials or with vacuum (`X0 = 0`) for comparison.
+  It defaults to the radiation length of dry air but can be replaced with other materials or with vacuum (`X0 = 0`) for comparison.
 
 ### License and Citation
 
