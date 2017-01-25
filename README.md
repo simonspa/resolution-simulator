@@ -56,7 +56,7 @@ This small collection of scripts provides a simple interface for the simulation 
 ### Prepare your own telescope simulation
 
 * All telescope assemblies are stored in the `devices` directory.
-* Take one of the provided examples, adapt it to your needs and add the executable to the `CMakeLists.txt` file in the devices directory in order to compile the executable.
+* Take one of the provided examples, adapt it to your needs and simply store the `.cc` file in the `devices` directory. CMake will automatically create a build target and compile an executable with the same name as the source file.
 * Have a look at the `devices/tscope_datura.cc` example for some explanatory comments on how to build the telescope assembly.
 
 ### Further instructions and hints
