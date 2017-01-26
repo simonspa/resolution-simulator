@@ -47,6 +47,7 @@ This small collection of scripts provides a simple interface for the simulation 
 * Clone and compile the GBL Resolution Calculator:
 
   ```
+  cd ../
   git clone https://github.com/simonspa/resolution-simulator.git && cd resolution-simulator/
   mkdir build && cd build
   cmake ..
