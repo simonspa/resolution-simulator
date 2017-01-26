@@ -44,7 +44,7 @@ This small collection of scripts provides a simple interface for the simulation 
   export GBLPATH=`pwd`
   ```
   
-* Clone and compile the GBL Resolution Calculator:
+* Clone and compile the GBL Track Resolution Calculator:
 
   ```
   cd ../
