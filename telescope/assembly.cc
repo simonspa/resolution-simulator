@@ -10,6 +10,26 @@ using namespace gblsim;
 using namespace unilog;
 using namespace gbl;
 
+plane plane::reference(double position)
+{
+  return plane(position, 0.0, false);
+}
+
+plane plane::inactive(double position, double material)
+{
+  return plane(position, material, false, 0);
+}
+
+plane plane::active(double position, double material, double resolution)
+{
+  return plane(position, material, true, resolution);
+}
+
+plane plane::reference(double position)
+{
+  return plane(position, 0.0, false);
+}
+
 plane::plane() :
   m_measurement(false),
   m_resolution(0),

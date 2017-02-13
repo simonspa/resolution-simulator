@@ -4,6 +4,13 @@
 namespace gblsim {
   class plane {
   public:
+    // Virtual reference plane w/o material or measurement
+    static plane reference(double position);
+    // A plane with material but no measurement
+    static plane inactive(double position, double material);
+    // A plane with material and measurements
+    static plane active(double position, double material, double resolution);
+
     plane();
     plane(double position, double material, bool measurement, double resolution = 0);
 
@@ -24,16 +31,6 @@ namespace gblsim {
 
   };
 
-  class scatterer : public plane {
-  public:
-  scatterer(double position, double material) : plane(position, material, false) {};
-  };
-
-  class reference : public plane {
-  public:
-  reference(double position) : plane(position, 0.0, false) {};
-  };
-    
   class telescope {
   public:
     telescope(std::vector<gblsim::plane> planes, double beam_energy, double material = X0_Air);
