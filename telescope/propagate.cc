@@ -33,7 +33,8 @@ TVectorD gblsim::getScatterer(double energy, double radlength, double total_radl
   return scat;
 }
 
-gbl::GblPoint gblsim::getPoint(double dz, double res, TVectorD wscat, bool has_meas) {
+// construct a GblPoint with a scatterer and a measurement
+gbl::GblPoint gblsim::getPoint(double dz, TVectorD res, TVectorD wscat) {
 
   // Propagate:
   TMatrixD jacPointToPoint = Jac5(dz);
@@ -44,29 +45,35 @@ gbl::GblPoint gblsim::getPoint(double dz, double res, TVectorD wscat, bool has_m
   scat.Zero(); // mean is zero
   point.addScatterer(scat, wscat);
   
-  // Add measurement if requested:
-  if(has_meas) {
-    // measurement = residual
-    TVectorD meas(2);
-    meas.Zero(); // ideal
-
-    // Precision = 1/resolution^2
-    TVectorD measPrec(2);
-    measPrec[0] = 1.0 / res / res;
-    measPrec[1] = 1.0 / res / res;
-
-    TMatrixD proL2m(2,2);
-    proL2m.UnitMatrix();
-  
-    point.addMeasurement(proL2m, meas, measPrec);
-  }
+  // Add measurement:
+  // measurement = residual
+  TVectorD meas(2);
+  meas.Zero(); // ideal
+  // Precision = 1/resolution^2
+  TVectorD measPrec(2);
+  measPrec[0] = 1.0 / res[0] / res[0];
+  measPrec[1] = 1.0 / res[1] / res[1];
+  // measurement plane == propagation plane
+  TMatrixD proL2m(2,2);
+  proL2m.UnitMatrix();
+  point.addMeasurement(proL2m, meas, measPrec);
 
   return point;
 }
 
+// construct a GblPoint with only a scatterer
 gbl::GblPoint gblsim::getPoint(double dz, TVectorD wscat) {
-  // This does not add a measurement - no resultion is given!
-  return getPoint(dz,0.0,wscat,false);
+
+  // Propagate:
+  TMatrixD jacPointToPoint = Jac5(dz);
+  gbl::GblPoint point(jacPointToPoint);
+
+  // Add scatterer:
+  TVectorD scat(2);
+  scat.Zero(); // mean is zero
+  point.addScatterer(scat, wscat);
+
+  return point;
 }
 
 gbl::GblPoint gblsim::getMarker(double dz) {
