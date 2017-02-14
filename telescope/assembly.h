@@ -18,7 +18,7 @@ namespace gblsim {
     plane();
     plane(double position, double material, bool measurement, double resolution = 0);
 
-    double position() { return m_position; }
+    double position() const { return m_position; }
 
     bool operator < (const plane& pl) const {
         return (m_position < pl.m_position);
@@ -43,19 +43,19 @@ namespace gblsim {
     telescope(std::vector<gblsim::plane> planes, double beam_energy, double material = X0_Air);
 
     // Return the trajectory
-    gbl::GblTrajectory getTrajectory();
+    gbl::GblTrajectory getTrajectory() const;
 
     // Return the resolution in both dimensions on the given plane
-    std::pair<double,double> getFullResolution(int plane);
+    std::pair<double,double> getFullResolution(int plane) const;
     // Return the resolution along the first dimension at given plane:
-    double getResolution(int plane);
+    double getResolution(int plane) const;
 
-    void printLabels();
+    void printLabels() const;
   private:
     // Radiationlength of the material of the surrounding volume, defaults to dry air:
     double m_volumeMaterial;
     
-    double getTotalMaterialBudget(std::vector<gblsim::plane> planes);
+    double getTotalMaterialBudget(const std::vector<plane>& planes) const;
     std::vector<gbl::GblPoint> m_listOfPoints;
     std::vector<int> m_listOfLabels;
   };

@@ -132,15 +132,15 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, doub
   LOG(logDEBUG) << "Finished building trajectory.";
 }
 
-double telescope::getTotalMaterialBudget(std::vector<gblsim::plane> planes) {
+double telescope::getTotalMaterialBudget(const std::vector<gblsim::plane>& planes) const {
 
   LOG(logDEBUG) << "Calculating total material budget in the particle path...";
   double total_materialbudget = 0;
 
   // Add the planes as scatterer:
-  for(std::vector<plane>::iterator p = planes.begin(); p != planes.end(); p++) {
-    LOG(logDEBUG2) << "Adding x/X0=" << p->m_materialbudget;
-    total_materialbudget += p->m_materialbudget;
+  for(const auto& p : planes) {
+    LOG(logDEBUG2) << "Adding x/X0=" << p.m_materialbudget;
+    total_materialbudget += p.m_materialbudget;
   }
 
   if(m_volumeMaterial > 0.0) {
@@ -154,14 +154,14 @@ double telescope::getTotalMaterialBudget(std::vector<gblsim::plane> planes) {
   return total_materialbudget;
 }
 
-GblTrajectory telescope::getTrajectory() {
+GblTrajectory telescope::getTrajectory() const {
 
   GblTrajectory traj(m_listOfPoints, 0);
   IFLOG(logDEBUG2) { traj.printPoints(); }
   return traj;
 }
 
-std::pair<double,double> telescope::getFullResolution(int plane) {
+std::pair<double,double> telescope::getFullResolution(int plane) const {
 
   GblTrajectory tr = getTrajectory();
 
@@ -182,11 +182,11 @@ std::pair<double,double> telescope::getFullResolution(int plane) {
   return std::make_pair(sqrt(aCov(3,3))*1E3,sqrt(aCov(4,4))*1E3);
 }
 
-double telescope::getResolution(int plane) {
+double telescope::getResolution(int plane) const {
   return std::get<0>(getFullResolution(plane));
 }
 
-void telescope::printLabels() {
+void telescope::printLabels() const {
 
   for(size_t l = 0; l < m_listOfLabels.size(); l++) {
     LOG(logDEBUG) << "Plane " << l << " label " << m_listOfLabels.at(l);
