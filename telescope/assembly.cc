@@ -12,38 +12,41 @@ using namespace gbl;
 
 plane plane::reference(double position)
 {
-  return plane(position, 0.0, false);
+  return plane(position, false, 0.0, false, {0.0, 0.0});
 }
 
 plane plane::inactive(double position, double material)
 {
-  return plane(position, material, false, 0);
+  return plane(position, true, material, false, {0.0, 0.0});
 }
 
 plane plane::active(double position, double material, double resolution)
 {
-  return plane(position, material, true, resolution);
+  return plane(position, true, material, true, {resolution, resolution});
 }
 
-plane plane::reference(double position)
+plane plane::active(double position, double material, std::pair<double, double> resolution)
 {
-  return plane(position, 0.0, false);
+  return plane(position, true, material, true, resolution);
 }
 
-plane::plane() :
-  m_measurement(false),
-  m_resolution(0),
-  m_scatterer(false),
-  m_materialbudget(0),
-  m_position(0) {}
-
-plane::plane(double position, double material, bool measurement, double resolution) :
-  m_measurement(measurement),
-  m_scatterer(true),
+plane::plane(double position,
+             bool has_scatterer, double material,
+             bool has_measurement, std::pair<double,double> resolution) :
+  m_measurement(has_measurement),
+  m_resolution(2),
+  m_scatterer(has_scatterer),
   m_materialbudget(material),
-  m_resolution(resolution),
-  m_position(position) {}
+  m_position(position)
+{
+  m_resolution[0] = std::get<0>(resolution);
+  m_resolution[1] = std::get<1>(resolution);
+}
 
+plane::plane(double position, double material, bool has_measurement, double resolution) :
+  plane(position, true, material, has_measurement, std::make_pair(resolution, resolution)) {}
+
+plane::plane() : plane(0, false, 0, false, std::make_pair(0.0, 0.0)) {}
 
 telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, double material) :
   m_volumeMaterial(material),
@@ -158,7 +161,7 @@ GblTrajectory telescope::getTrajectory() {
   return traj;
 }
 
-double telescope::getResolution(int plane) {
+std::pair<double,double> telescope::getFullResolution(int plane) {
 
   GblTrajectory tr = getTrajectory();
 
@@ -176,7 +179,11 @@ double telescope::getResolution(int plane) {
   if(plane < m_listOfLabels.size()) {
     tr.getResults(m_listOfLabels.at(plane), aCorr, aCov);
   }
-  return sqrt(aCov(3,3))*1E3;
+  return std::make_pair(sqrt(aCov(3,3))*1E3,sqrt(aCov(4,4))*1E3);
+}
+
+double telescope::getResolution(int plane) {
+  return std::get<0>(getFullResolution(plane));
 }
 
 void telescope::printLabels() {
