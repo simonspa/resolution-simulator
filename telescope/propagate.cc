@@ -34,7 +34,7 @@ TVectorD gblsim::getScatterer(double energy, double radlength, double total_radl
 }
 
 // construct a GblPoint with a scatterer and a measurement
-gbl::GblPoint gblsim::getPoint(double dz, TVectorD res, TVectorD wscat) {
+gbl::GblPoint gblsim::getPoint(double dz, const TVectorD& res, const TVectorD& wscat) {
 
   // Propagate:
   TMatrixD jacPointToPoint = Jac5(dz);
@@ -62,7 +62,7 @@ gbl::GblPoint gblsim::getPoint(double dz, TVectorD res, TVectorD wscat) {
 }
 
 // construct a GblPoint with only a scatterer
-gbl::GblPoint gblsim::getPoint(double dz, TVectorD wscat) {
+gbl::GblPoint gblsim::getPoint(double dz, const TVectorD& wscat) {
 
   // Propagate:
   TMatrixD jacPointToPoint = Jac5(dz);
