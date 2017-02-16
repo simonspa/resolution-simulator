@@ -61,6 +61,14 @@ gbl::GblPoint gblsim::getPoint(double dz, const TVectorD& res, const TVectorD& w
   return point;
 }
 
+gbl::GblPoint gblsim::getPoint(double dz, double res, const TVectorD& wscat)
+{
+  TVectorD res2(2);
+  res2[0] = res;
+  res2[1] = res;
+  return getPoint(dz, res2, wscat);
+}
+
 // construct a GblPoint with only a scatterer
 gbl::GblPoint gblsim::getPoint(double dz, const TVectorD& wscat) {
 
