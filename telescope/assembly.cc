@@ -161,7 +161,7 @@ GblTrajectory telescope::getTrajectory() const {
   return traj;
 }
 
-std::pair<double,double> telescope::getFullResolution(int plane) const {
+std::pair<double,double> telescope::getResolutionXY(int plane) const {
 
   GblTrajectory tr = getTrajectory();
 
@@ -183,7 +183,7 @@ std::pair<double,double> telescope::getFullResolution(int plane) const {
 }
 
 double telescope::getResolution(int plane) const {
-  return std::get<0>(getFullResolution(plane));
+  return std::get<0>(getResolutionXY(plane));
 }
 
 void telescope::printLabels() const {

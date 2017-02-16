@@ -45,10 +45,10 @@ namespace gblsim {
     // Return the trajectory
     gbl::GblTrajectory getTrajectory() const;
 
-    // Return the resolution in both dimensions on the given plane
-    std::pair<double,double> getFullResolution(int plane) const;
     // Return the resolution along the first dimension at given plane:
     double getResolution(int plane) const;
+    // Return the resolution in both dimensions on the given plane
+    std::pair<double,double> getResolutionXY(int plane) const;
 
     void printLabels() const;
   private:
