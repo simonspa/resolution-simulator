@@ -53,6 +53,7 @@ gbl::GblPoint gblsim::getPoint(double dz, const TVectorD& res, const TVectorD& w
   TVectorD measPrec(2);
   measPrec[0] = 1.0 / res[0] / res[0];
   measPrec[1] = 1.0 / res[1] / res[1];
+
   // measurement plane == propagation plane
   TMatrixD proL2m(2,2);
   proL2m.UnitMatrix();
@@ -63,6 +64,7 @@ gbl::GblPoint gblsim::getPoint(double dz, const TVectorD& res, const TVectorD& w
 
 gbl::GblPoint gblsim::getPoint(double dz, double res, const TVectorD& wscat)
 {
+  
   TVectorD res2(2);
   res2[0] = res;
   res2[1] = res;
