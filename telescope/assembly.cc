@@ -1,3 +1,6 @@
+// Simon Spannagel (DESY) January 2016
+// Hendrik Jansen (DESY) August 2018
+
 #include "assembly.h"
 #include "log.h"
 #include "constants.h"
@@ -62,7 +65,6 @@ plane::plane(double position, bool has_scatterer, bool has_measurement, double s
 {
   m_resolution[0] = 0.0;
   m_resolution[1] = 0.0;
-  std::cout << "TEST; m_size = " << m_size << std::endl;
 } 
 
 plane::plane() : plane(0, false, 0, false, std::make_pair(0.0, 0.0), 0.0) {}

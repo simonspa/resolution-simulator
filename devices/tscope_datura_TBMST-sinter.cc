@@ -1,4 +1,5 @@
 // Simon Spannagel (DESY) January 2016
+// Hendrik Jansen (DESY) August 2018
 
 #include "TCanvas.h"
 #include "TProfile.h"
@@ -34,7 +35,7 @@ int main(int argc, char* argv[]) {
     } 
   }
 
-  TFile * out = TFile::Open("datura-resolution.root","RECREATE");
+  TFile * out = TFile::Open("datura-kink-resolution.root","RECREATE");
   gDirectory->pwd();
 
   TCanvas *c1 = new TCanvas("c1","resolution",700,700);
@@ -58,8 +59,8 @@ int main(int argc, char* argv[]) {
   //        DIST_up   DUT_DIST_up  DUT_DIST_down  DIST_down
   
   // Distance between telescope planes in mm:
-  double DIST_up= 150; // total arm = 300, = 5 x DUT_DIST_up
-  //double DIST_down; // total arm = 200, = 5x DUT_DIST_down
+  double DIST_up= 150; 
+
   // Distance of telescope arms and DUT assembly:
   double DUT_DIST_up = 60;
   double DUT_DIST_down = 40;
@@ -67,6 +68,7 @@ int main(int argc, char* argv[]) {
   // Beam energy 2 GeV electrons/positrons at DESY, highest rate
   double BEAM = 2.0;
 
+  // Nickel target with 16 mm thickness 
   double dut_x0 = 16./14.24;
 
   //----------------------------------------------------------------------------
@@ -75,7 +77,8 @@ int main(int argc, char* argv[]) {
   // Build a vector of all telescope planes:
   std::vector<plane> datura;
   double position = 0;
-  
+ 
+  //scan reso and kink reso a.f.o. downstream plane spacing "DIST_down"
   for(double DIST_down = 10.; DIST_down < 155.; DIST_down += 10.) {
 
     // Upstream telescope arm:
