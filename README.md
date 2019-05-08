@@ -22,13 +22,30 @@ This small collection of scripts provides a simple interface for the simulation 
 
 ### Installation
 
+#### LXPLUS / CERN machine with CVMFS
+
+If you are running this on a CERN machine with access to CVMFS (such as LXPLUS), all dependencies are already present. Simply do
+
+```bash
+$ source init_x86_64.sh
+$ mkdir build; cd build
+$ cmake ..
+$ make
+```
+
+and you are done.
+
+#### Installation from scratch
+
+First, the dependencies need to be installed, namely ROOT, GBL and Eigen3.
+
 * Install and source ROOT (from https://root.cern.ch/), either ROOT5 or ROOT6 will work fine.
 
 * Install GBL
   (from https://www.wiki.terascale.de/index.php/GeneralBrokenLines)
 
   ```
-  svn checkout http://svnsrv.desy.de/public/GeneralBrokenLines/tags/V01-18-00/cpp GeneralBrokenLines
+  git clone https://github.com/GeneralBrokenLines/GeneralBrokenLines.git GeneralBrokenLines
   cd GeneralBrokenLines
   mkdir build && cd build/
   cmake ..
