@@ -14,9 +14,12 @@ namespace gblsim {
     static plane active(double position, double material, double resolution);
     // A plane with material and different resolutions along each axis
     static plane active(double position, double material, std::pair<double,double> resolution);
+    // A plane with unkonwn material, no measurement, and a certain size
+    static plane unknown(double position, double size);
 
     plane();
-    plane(double position, double material, bool measurement, double resolution = 0);
+    plane(double position, double material, bool measurement, double resolution = 0, double size = -1.);
+    plane(double position, bool scatterer, bool measurement, double size);
 
     double position() const { return m_position; }
 
@@ -24,16 +27,25 @@ namespace gblsim {
         return (m_position < pl.m_position);
     }
 
+
   private:
     plane(double position,
           bool has_scatterer, double material,
-          bool has_measurement, std::pair<double,double> resolution);
+          bool has_measurement, std::pair<double,double> resolution,
+	  double size);
 
     bool m_measurement;
-    TVectorD m_resolution;
+    Eigen::Vector2d m_resolution;
     bool m_scatterer;
     double m_materialbudget;
     double m_position;
+    double m_size;
+
+    void print() {
+      std::cout << "Plane position = " << m_position << std::endl;
+      std::cout << "Plane res[0] = " << m_resolution[0] << std::endl;
+      std::cout << "Plane res[1] = " << m_resolution[1] << std::endl;
+    }
 
     friend class telescope;
   };
@@ -50,6 +62,11 @@ namespace gblsim {
     // Return the resolution in both dimensions on the given plane
     std::pair<double,double> getResolutionXY(int plane) const;
 
+    // Return the kink resolution along the first dimension at given plane:
+    double getKinkResolution(int plane) const;
+    // Return the kink resolution in both dimensions on the given plane
+    std::pair<double,double> getKinkResolutionXY(int plane) const;
+
     void printLabels() const;
   private:
     // Radiationlength of the material of the surrounding volume, defaults to dry air:
@@ -58,5 +75,6 @@ namespace gblsim {
     double getTotalMaterialBudget(const std::vector<plane>& planes) const;
     std::vector<gbl::GblPoint> m_listOfPoints;
     std::vector<int> m_listOfLabels;
+    unsigned int m_parameter;
   };
 }

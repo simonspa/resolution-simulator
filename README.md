@@ -17,6 +17,7 @@ This small collection of scripts provides a simple interface for the simulation 
 * Planes ordered automatically in `z` for correct GBL trajectory building
 * Radiation length for some common materials are defined in `utils/materials.h`
 * The scattering is correctly treated by using the total scattering material of the track and weighting the individual scatterer contributions with their respective material budget.
+* Allows for inclusion of 'unknown scatterers', for which the material budget can be determined from unbiasd kinks at the unknown scatterer.
 
 
 ### Installation
@@ -63,11 +64,13 @@ This small collection of scripts provides a simple interface for the simulation 
 
 ### Further instructions and hints
 
-* The resolution can only be evaluated at a previously defined plane. This can either be a plane with measurements, a scatterer, or a plane with no material attached. They can be defined as follows:
+* The resolution can only be evaluated at a previously defined plane. This can either be a plane with measurements and scatterer, only a scatterer, an unknown scatterer, or a plane with no material attached. They can be defined as follows:
 
   `gblsim::plane measurement(position, material, TRUE, resolution);` - plane with measurement and scattering material
 
   `gblsim::plane scatterer(position, material, FALSE);` - plane with scattering material but no measurement
+
+  `gblsim::plane unknown(position, size);` - plane with unknown and t.b.d. scattering material but no measurement
 
   `gblsim::plane reference(position, 0, FALSE);` - plane with zero material and no measurement (simple reference point)
 
@@ -79,13 +82,17 @@ This small collection of scripts provides a simple interface for the simulation 
   double MIM26 = 50e-3 / X0_Si + 50e-3 / X0_Kapton;
   ```
 
-* The resolution should always be given as intrinsic resolution of the respective sensor in units of micrometer.
+* The resolution should always be given as intrinsic resolution of the respective sensor in units of millimeter.
 
 * The constructor of the telescope class takes the radiation length of the surrounding volume as optional parameter:
 
   `telescope(std::vector<gblsim::plane> planes, double beam_energy, double material = X0_Air);`
 
   It defaults to the radiation length of dry air but can be replaced with other materials or with vacuum (`X0 = 0`) for comparison.
+
+* `getResolution(plane)` returns the track resolution at the given plane in [um].
+
+* `getKinkResolution(plane)` should only be used at "unknown" planes and returns the angular kink resolution at the given plane.
 
 ### License and Citation
 

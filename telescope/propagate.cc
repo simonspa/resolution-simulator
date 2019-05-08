@@ -1,16 +1,16 @@
 #include "propagate.h"
 
-TMatrixD gblsim::Jac5(double ds) {
+gbl::Matrix5d gblsim::Jac5(double ds) {
   /* 
      straight line, no B-field
      track = 
      q/p, x', y', x, y
      0,   1,  2,  3, 4
   */
-  TMatrixD jac(5, 5);
-  jac.UnitMatrix();
-  jac[3][1] = ds; // x = xp * ds
-  jac[4][2] = ds; // y = yp * ds
+  gbl::Matrix5d jac;
+  jac.setIdentity();
+  jac(3, 1) = ds; // x = xp * ds
+  jac(4, 2) = ds; // y = yp * ds
   return jac;
 }
 
@@ -23,62 +23,60 @@ double gblsim::getTheta(double energy, double radlength, double total_radlength)
   return (0.0136*sqrt(radlength)/energy*(1+0.038*log(total_radlength)));
 }
 
-TVectorD gblsim::getScatterer(double energy, double radlength, double total_radlength) {
-  TVectorD scat(2);
+Eigen::Vector2d gblsim::getScatterer(double energy, double radlength, double total_radlength) {
+  Eigen::Vector2d scat;
 
   double theta = getTheta(energy,radlength,total_radlength);
-  scat[0] = 1.0 / (theta*theta);
-  scat[1] = 1.0 / (theta*theta);
+  scat << 1.0 / (theta*theta), 1.0 / (theta*theta);
 
   return scat;
 }
 
 // construct a GblPoint with a scatterer and a measurement
-gbl::GblPoint gblsim::getPoint(double dz, const TVectorD& res, const TVectorD& wscat) {
+gbl::GblPoint gblsim::getPoint(double dz, const Eigen::Vector2d& res, const Eigen::Vector2d& wscat) {
 
   // Propagate:
-  TMatrixD jacPointToPoint = Jac5(dz);
+  auto jacPointToPoint = Jac5(dz);
   gbl::GblPoint point(jacPointToPoint);
 
   // Add scatterer:
-  TVectorD scat(2);
-  scat.Zero(); // mean is zero
+  Eigen::Vector2d scat(0., 0.);
   point.addScatterer(scat, wscat);
   
   // Add measurement:
   // measurement = residual
-  TVectorD meas(2);
-  meas.Zero(); // ideal
+  Eigen::Vector2d meas;
+  meas.setZero(); // ideal
   // Precision = 1/resolution^2
-  TVectorD measPrec(2);
-  measPrec[0] = 1.0 / res[0] / res[0];
-  measPrec[1] = 1.0 / res[1] / res[1];
+  Eigen::Vector2d measPrec;
+  measPrec << 1.0 / res[0] / res[0], 1.0 / res[1] / res[1];
+
   // measurement plane == propagation plane
-  TMatrixD proL2m(2,2);
-  proL2m.UnitMatrix();
+  Eigen::Matrix2d proL2m;
+  proL2m.setIdentity();
   point.addMeasurement(proL2m, meas, measPrec);
 
   return point;
 }
 
-gbl::GblPoint gblsim::getPoint(double dz, double res, const TVectorD& wscat)
+gbl::GblPoint gblsim::getPoint(double dz, double res, const Eigen::Vector2d& wscat)
 {
-  TVectorD res2(2);
-  res2[0] = res;
-  res2[1] = res;
+  
+  Eigen::Vector2d res2;
+  res2 << res, res;
   return getPoint(dz, res2, wscat);
 }
 
 // construct a GblPoint with only a scatterer
-gbl::GblPoint gblsim::getPoint(double dz, const TVectorD& wscat) {
+gbl::GblPoint gblsim::getPoint(double dz, const Eigen::Vector2d& wscat) {
 
   // Propagate:
-  TMatrixD jacPointToPoint = Jac5(dz);
+  auto jacPointToPoint = Jac5(dz);
   gbl::GblPoint point(jacPointToPoint);
 
   // Add scatterer:
-  TVectorD scat(2);
-  scat.Zero(); // mean is zero
+  Eigen::Vector2d scat;
+  scat.setZero(); // mean is zero
   point.addScatterer(scat, wscat);
 
   return point;
@@ -87,7 +85,7 @@ gbl::GblPoint gblsim::getPoint(double dz, const TVectorD& wscat) {
 gbl::GblPoint gblsim::getMarker(double dz) {
 
   // Propagate:
-  TMatrixD jacPointToPoint = Jac5(dz);
+  auto jacPointToPoint = Jac5(dz);
   gbl::GblPoint point(jacPointToPoint);
 
   return point;
