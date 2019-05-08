@@ -35,7 +35,7 @@ namespace gblsim {
 	  double size);
 
     bool m_measurement;
-    TVectorD m_resolution;
+    Eigen::Vector2d m_resolution;
     bool m_scatterer;
     double m_materialbudget;
     double m_position;

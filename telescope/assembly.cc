@@ -141,8 +141,8 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, doub
     if(pl->m_measurement) {
       gbl::GblPoint point(getPoint(distance,pl->m_resolution,getScatterer(beam_energy,pl->m_materialbudget,total_materialbudget)));
       //m_listOfPoints.push_back(getPoint(distance,pl->m_resolution,getScatterer(beam_energy,pl->m_materialbudget,total_materialbudget)));
-      TMatrixD addDer(2,4);
-      addDer.Zero();
+      Eigen::Matrix<double, 2, 3> addDer;
+      addDer.setZero();
       if(arcDUT > 0) {
         addDer(0,0) = (arclength - (arcDUT + size/sqrt(12))); // First scatterer in target
 	addDer(1,1) = (arclength - (arcDUT + size/sqrt(12))); //
@@ -223,8 +223,8 @@ std::pair<double,double> telescope::getResolutionXY(int plane) const {
   LOG(logDEBUG2) << " Fit: Chi2=" << c2 << ", Ndf=" << ndf << ", lostWeight=" << lw;
   IFLOG(logDEBUG2) { tr.printTrajectory(); }
 
-  TVectorD aCorr(m_parameter);
-  TMatrixDSym aCov(m_parameter);
+  Eigen::VectorXd aCorr(m_parameter);
+  Eigen::MatrixXd aCov(m_parameter, m_parameter);
 
   // Get resolution at position of the DUT:
   if(plane < m_listOfLabels.size()) {
@@ -249,8 +249,8 @@ std::pair<double,double> telescope::getKinkResolutionXY(int plane) const {
   LOG(logDEBUG2) << " Fit: Chi2=" << c2 << ", Ndf=" << ndf << ", lostWeight=" << lw;
   IFLOG(logDEBUG2) { tr.printTrajectory(); }
 
-  TVectorD aCorr(m_parameter);
-  TMatrixDSym aCov(m_parameter);
+  Eigen::VectorXd aCorr(m_parameter);
+  Eigen::MatrixXd aCov(m_parameter, m_parameter);
 
   // Get resolution at position of the DUT:
   if(plane < m_listOfLabels.size()) {
