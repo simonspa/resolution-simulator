@@ -1,212 +1,323 @@
 /**
- * Universal Logging Class
+ * @file
+ * @brief Provides a logger and macros for convenient access
+ * @copyright Copyright (c) 2021 Simon Spannagel
+ * This software is distributed under the terms of the MIT License, copied verbatim in the file "LICENSE.md".
+ * In applying this license, CERN does not waive the privileges and immunities granted to it by virtue of its status as an
+ * Intergovernmental Organization or submit itself to any jurisdiction.
  */
 
 #ifndef UNILOG_H
 #define UNILOG_H
 
-/** Cannot use stdint.h when running rootcint on WIN32 */
-#if((defined WIN32) && (defined __CINT__))
-typedef unsigned int uint32_t;
-typedef unsigned int DWORD;
-#include <Windows4Root.h>
-#else
-#if(defined WIN32)
-typedef unsigned int uint32_t;
-#include <Windows.h>
-#else
-#include <cstdint>
-#include <sys/time.h>
-#endif // WIN32
-#endif // WIN32 && CINT
-
 #ifdef WIN32
 #define __func__ __FUNCTION__
-#endif // WIN32
+#endif
 
-#include <cstdio>
 #include <cstring>
-#include <iomanip>
+#include <mutex>
+#include <ostream>
 #include <sstream>
+#include <string>
+#include <vector>
 
 namespace unilog {
-
-    enum TLogLevel {
-        logCRITICAL,
-        logERROR,
-        logRESULT,
-        logWARNING,
-        logINFO,
-        logDEBUG,
-        logDEBUG2,
-        logDEBUG3,
-        logDEBUG4,
-        logDEBUG5
+    /**
+     * @brief Logging detail level
+     */
+    enum class LogLevel {
+        FATAL = 0, ///< Fatal problems that terminate the framework (typically exceptions)
+        STATUS,    ///< Only critical progress information
+        ERROR,     ///< Critical problems that usually lead to fatal errors
+        WARNING,   ///< Possible issue that could lead to unexpected results
+        INFO,      ///< General information about processes (should not be called in run function)
+        DEBUG,     ///< Detailed information about physics process
+        NONE,      ///< Indicates the log level has not been set (cannot be selected by the user)
+        TRACE,     ///< Software debugging information about what part is currently running
+        PRNG,      ///< Logging level printing every pseudo-random number requested
+    };
+    /**
+     * @brief Format of the logger
+     */
+    enum class LogFormat {
+        SHORT = 0, ///< Only include a single character for the log level, the section header and the message
+        DEFAULT,   ///< Also include the time and a full logging level description
+        LONG       ///< All of the above and also information about the file and line where the message was defined
     };
 
-    template <typename T> class uniLog {
+    /**
+     * @brief Logger of the framework to inform the user of process
+     *
+     * Should almost never be instantiated directly. The \ref LOG macro should be used instead to pass all the information.
+     * This leads to a cleaner interface for sending log messages.
+     */
+    // TODO [DOC] This just be renamed to Log?
+    class DefaultLogger {
     public:
-        uniLog();
-        virtual ~uniLog();
-        std::ostringstream&
-        Get(TLogLevel level = logINFO, const std::string& file = "", const std::string& function = "", uint32_t line = 0);
+        /**
+         * @brief Construct a logger
+         */
+        DefaultLogger();
+        /**
+         * @brief Write the output to the streams and destruct the logger
+         */
+        ~DefaultLogger();
 
-        static TLogLevel& ReportingLevel();
-        static std::string ToString(TLogLevel level);
-        static TLogLevel FromString(const std::string& level);
+        ///@{
+        /**
+         * @brief Disable copying
+         */
+        DefaultLogger(const DefaultLogger&) = delete;
+        DefaultLogger& operator=(const DefaultLogger&) = delete;
+        ///@}
 
-    protected:
-        std::ostringstream os;
+        ///@{
+        /**
+         * @brief Use default move behaviour
+         */
+        DefaultLogger(DefaultLogger&&) noexcept(false) = default;
+        DefaultLogger& operator=(DefaultLogger&&) noexcept(false) = default;
+        ///@}
+
+        /**
+         * @brief Gives a stream to write to using the C++ stream syntax
+         * @param level Logging level
+         * @param file The file name of the file containing the log message
+         * @param function The function containing the log message
+         * @param line The line number of the log message
+         * @return A C++ stream to write to
+         */
+        std::ostringstream& getStream(LogLevel level = LogLevel::INFO,
+                                      const std::string& file = "",
+                                      const std::string& function = "",
+                                      uint32_t line = 0);
+
+        /**
+         * @brief Gives a process stream which updates the same line as long as it is the same
+         * @param identifier Name to indicate the line, used to distinguish when to update or write new line
+         * @param level Logging level
+         * @param file The file name of the file containing the log message
+         * @param function The function containing the log message
+         * @param line The line number of the log message
+         * @return A C++ stream to write to
+         */
+        std::ostringstream& getProcessStream(std::string identifier,
+                                             LogLevel level = LogLevel::INFO,
+                                             const std::string& file = "",
+                                             const std::string& function = "",
+                                             uint32_t line = 0);
+
+        /**
+         * @brief Finish the logging ensuring proper termination of all streams
+         */
+        static void finish();
+
+        /**
+         * @brief Get the reporting level for logging
+         * @return The current log level
+         */
+        static LogLevel getReportingLevel();
+        /**
+         * @brief Set a new reporting level to use for logging
+         * @param level The new log level
+         */
+        static void setReportingLevel(LogLevel level);
+
+        /**
+         * @brief Convert a string to a LogLevel
+         * @param level Name of the level
+         * @return Log level corresponding to the name
+         */
+        static LogLevel getLevelFromString(const std::string& level);
+        /**
+         * @brief Convert a LogLevel to a string
+         * @param level Log level
+         * @return Name corresponding to the log level
+         */
+        static std::string getStringFromLevel(LogLevel level);
+
+        /**
+         * @brief Get the logging format
+         * @return Current log format
+         */
+        static LogFormat getFormat();
+        /**
+         * @brief Set a new logging format
+         * @param format New log log format
+         */
+        static void setFormat(LogFormat format);
+
+        /**
+         * @brief Convert a string to a LogFormat
+         * @param format Name of the format
+         * @return Log format corresponding to the name
+         */
+        static LogFormat getFormatFromString(const std::string& format);
+        /**
+         * @brief Convert a LogFormat to a string
+         * @param format Log format
+         * @return Name corresponding to the log format
+         */
+        static std::string getStringFromFormat(LogFormat format);
+
+        /**
+         * @brief Add a stream to write the log message
+         * @param stream Stream to write to
+         */
+        static void addStream(std::ostream& stream);
+        /**
+         * @brief Clear and delete all streams that the logger writes to
+         */
+        static void clearStreams();
+        /**
+         * @brief Return all the streams the logger writes to
+         * @return List of all the streams used
+         */
+        static const std::vector<std::ostream*>& getStreams();
+
+        /**
+         * @brief Set the section header to use from now on
+         * @param header Header to use
+         */
+        static void setSection(std::string header);
+        /**
+         * @brief Get the current section header
+         * @return Header used
+         */
+        static std::string getSection();
+
+        /**
+         * @brief Set the current event number from now on
+         * @param event_num Event number to use
+         */
+        static void setEventNum(uint64_t event_num);
+        /**
+         * @brief Get the current event number
+         * @return Event number used
+         */
+        static uint64_t getEventNum();
 
     private:
-        uniLog(const uniLog&) = delete;
-        uniLog& operator=(const uniLog&) = delete;
-        std::string NowTime();
+        /**
+         * @brief Get the current date as a printable string
+         * @return Current date as a string
+         */
+        std::string get_current_date();
+
+        /**
+         * @brief Return if a stream is likely a terminal screen (supporting colors etc.)
+         * @return True if the stream is terminal, false otherwise
+         */
+        static bool is_terminal(std::ostream& stream);
+
+        // Output stream
+        std::ostringstream os;
+
+        // Number of exceptions to prevent abort
+        int exception_count_{};
+        // Saved value of the length of the header indent
+        unsigned int indent_count_{};
+
+        // Internal methods to store static values
+        static std::string& get_section();
+        static uint64_t& get_event_num();
+        static LogLevel& get_reporting_level();
+        static LogFormat& get_format();
+        static std::vector<std::ostream*>& get_streams();
+
+        // Name of the process to log or empty if a normal log message
+        std::string identifier_{};
+        static std::string last_message_;
+        static std::string last_identifier_;
+
+        static std::mutex write_mutex_;
     };
 
-    template <typename T> uniLog<T>::uniLog() = default;
+    using Log = DefaultLogger;
 
-#ifdef WIN32
-
-    template <typename T> std::string uniLog<T>::NowTime() {
-        const int MAX_LEN = 200;
-        char buffer[MAX_LEN];
-        if(GetTimeFormatA(LOCALE_USER_DEFAULT, 0, 0, "HH':'mm':'ss", buffer, MAX_LEN) == 0)
-            return "Error in NowTime()";
-
-        char result[100] = {0};
-        static DWORD first = GetTickCount();
-        std::sprintf(result, "%s.%03ld", buffer, static_cast<long>(GetTickCount() - first) % 1000);
-        return result;
-    }
-
-#else
-
-    template <typename T> std::string uniLog<T>::NowTime() {
-        char buffer[11];
-        time_t t = 0;
-        time(&t);
-        tm r = *localtime(&t);
-        strftime(buffer, sizeof(buffer), "%X", localtime_r(&t, &r));
-        struct timeval tv;
-        gettimeofday(&tv, nullptr);
-        char result[100] = {0};
-        std::sprintf(result, "%s.%03ld", buffer, tv.tv_usec / 1000);
-        return result;
-    }
-
-#endif // WIN32
-
-    template <typename T>
-    std::ostringstream&
-    uniLog<T>::Get(TLogLevel level, const std::string& file, const std::string& function, uint32_t line) {
-        os << "[" << NowTime() << "] ";
-        os << std::setw(8) << ToString(level) << ": ";
-
-        // For debug levels we want also function name and line number printed:
-        if(level != logINFO && level != logRESULT && level != logWARNING) {
-            os << "<" << file << "/" << function << ":L" << line << "> ";
-        }
-
-        return os;
-    }
-
-    template <typename T> uniLog<T>::~uniLog() {
-        os << std::endl;
-        T::Output(os.str());
-    }
-
-    template <typename T> TLogLevel& uniLog<T>::ReportingLevel() {
-        static TLogLevel reportingLevel = logINFO;
-        return reportingLevel;
-    }
-
-    template <typename T> std::string uniLog<T>::ToString(TLogLevel level) {
-        static const char* const buffer[] = {
-            "CRITICAL", "ERROR", "RESULT", "WARNING", "INFO", "DEBUG", "DEBUG2", "DEBUG3", "DEBUG4", "DEBUG5"};
-        return buffer[level];
-    }
-
-    template <typename T> TLogLevel uniLog<T>::FromString(const std::string& level) {
-        if(level == "DEBUG5") {
-            return logDEBUG5;
-        }
-        if(level == "DEBUG4") {
-            return logDEBUG4;
-        }
-        if(level == "DEBUG3") {
-            return logDEBUG3;
-        }
-        if(level == "DEBUG2") {
-            return logDEBUG2;
-        }
-        if(level == "DEBUG") {
-            return logDEBUG;
-        }
-        if(level == "INFO") {
-            return logINFO;
-        }
-        if(level == "WARNING") {
-            return logWARNING;
-        }
-        if(level == "ERROR") {
-            return logERROR;
-        }
-        if(level == "CRITICAL") {
-            return logCRITICAL;
-        }
-        if(level == "RESULT") {
-            return logRESULT;
-        }
-        uniLog<T>().Get(logWARNING) << "Unknown logging level '" << level << "'. Using WARNING level as default.";
-        return logWARNING;
-    }
-
-    class SetLogOutput {
-    public:
-        static FILE*& Stream();
-        static bool& Duplicate();
-        static void Output(const std::string& msg);
-    };
-
-    inline bool& SetLogOutput::Duplicate() {
-        static bool duplic = false;
-        return duplic;
-    }
-
-    inline FILE*& SetLogOutput::Stream() {
-        static FILE* pStream = stderr;
-        return pStream;
-    }
-
-    inline void SetLogOutput::Output(const std::string& msg) {
-        FILE* pStream = Stream();
-        if(pStream == nullptr) {
-            return;
-        }
-        // Check if duplication to stderr is needed:
-        if(Duplicate() && pStream != stderr) {
-            fprintf(stderr, "%s", msg.c_str());
-        }
-        fprintf(pStream, "%s", msg.c_str());
-        fflush(pStream);
-    }
-
-    using Log = uniLog<SetLogOutput>;
-
+#ifndef __FILE_NAME__
+/**
+ *  @brief Base name of the file without the directory
+ */
 #define __FILE_NAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+#endif
 
-#define IFLOG(level)                                                                                                        \
-    if(level > unilog::Log::ReportingLevel() || !unilog::SetLogOutput::Stream())                                            \
-        ;                                                                                                                   \
-    else
+/**
+ * @brief Execute a block only if the reporting level is high enough
+ * @param level The minimum log level
+ */
+#define IFLOG(level) if(unilog::LogLevel::level <= unilog::Log::getReportingLevel() && !unilog::Log::getStreams().empty())
 
+/**
+ * @brief Create a logging stream if the reporting level is high enough
+ * @param level The log level of the stream
+ */
 #define LOG(level)                                                                                                          \
-    if(level > unilog::Log::ReportingLevel() || !unilog::SetLogOutput::Stream())                                            \
-        ;                                                                                                                   \
-    else                                                                                                                    \
-        unilog::Log().Get(level, __FILE_NAME__, __func__, __LINE__)
+    if(unilog::LogLevel::level <= unilog::Log::getReportingLevel() && !unilog::Log::getStreams().empty())                   \
+    unilog::Log().getStream(                                                                                                \
+        unilog::LogLevel::level, __FILE_NAME__, std::string(static_cast<const char*>(__func__)), __LINE__)
 
+/**
+ * @brief Create a logging stream that overwrites the line if the previous message has the same identifier
+ * @param level The log level of the stream
+ * @param identifier Identifier for this stream to determine overwrites
+ */
+#define LOG_PROGRESS(level, identifier)                                                                                     \
+    if(unilog::LogLevel::level <= unilog::Log::getReportingLevel() && !unilog::Log::getStreams().empty())                   \
+    unilog::Log().getProcessStream(                                                                                         \
+        identifier, unilog::LogLevel::level, __FILE_NAME__, std::string(static_cast<const char*>(__func__)), __LINE__)
+
+/**
+ * @brief Create a logging stream if the reporting level is high enough and this message has not yet been logged
+ * @param level The log level of the stream
+ */
+#define LOG_ONCE(level) LOG_N(level, 1)
+
+/**
+ * @brief Generator for a local variable to hold the logging count of a message
+ * @param  Count Number of allowed counts
+ * @return       Local counter variable
+ */
+#define GENERATE_LOG_VAR(Count) static std::atomic<int> local___FUNCTION__##Count##__LINE__(Count)
+#define GET_LOG_VARIABLE(Count) local___FUNCTION__##Count##__LINE__
+
+/**
+ * @brief Create a logging stream if the reporting level is high enough and this message has not yet been logged more than
+ * max_log_count times.
+ * @param level The log level of the stream
+ * @param max_log_count Maximum number of times this message is allowed to be logged
+ */
+#define LOG_N(level, max_log_count)                                                                                         \
+    GENERATE_LOG_VAR(max_log_count);                                                                                        \
+    if(GET_LOG_VARIABLE(max_log_count) > 0)                                                                                 \
+        if(unilog::LogLevel::level <= unilog::Log::getReportingLevel() && !unilog::Log::getStreams().empty())               \
+    unilog::Log().getStream(                                                                                                \
+        unilog::LogLevel::level, __FILE_NAME__, std::string(static_cast<const char*>(__func__)), __LINE__)                  \
+        << std::string(--GET_LOG_VARIABLE(max_log_count) == 0 ? "[further messages suppressed] " : "")
+
+    /**
+     * @brief Suppress a stream from writing any output
+     * @param stream The stream to suppress
+     */
+    // suppress a (logging) stream
+    // TODO [doc] rewrite as a lowercase function in a namespace?
+    inline void SUPPRESS_STREAM(std::ostream& stream) { stream.setstate(std::ios::failbit); }
+
+/**
+ * @brief Suppress a stream from writing output unless logging is below \ref unilog::LogLevel
+ * @param  level  The log level of the stream
+ * @param  stream Stream to suppress
+ */
+#define SUPPRESS_STREAM_EXCEPT(level, stream)                                                                               \
+    IFLOG(level);                                                                                                           \
+    else SUPPRESS_STREAM(stream);
+
+    /**
+     * @brief Release an suppressed stream so it can write again
+     * @param stream The stream to release
+     */
+    // TODO [doc] rewrite as a lowercase function in a namespace?
+    inline void RELEASE_STREAM(std::ostream& stream) { stream.clear(); }
 } // namespace unilog
 
 #endif /* UNILOG_H */

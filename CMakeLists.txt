@@ -165,7 +165,8 @@ INCLUDE_DIRECTORIES(SYSTEM ${ROOT_INCLUDE_DIR} ${GBL_INCLUDE_DIR} ${EIGEN3_INCLU
 # Build the telescope sim library
 ADD_LIBRARY(${PROJECT_NAME} SHARED
   telescope/propagate.cc
-  telescope/assembly.cc)
+  telescope/assembly.cc
+  utils/log.cpp)
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC ${GBL_LIBRARY} Eigen3::Eigen)
 
