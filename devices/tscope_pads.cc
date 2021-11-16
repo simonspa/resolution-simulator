@@ -21,13 +21,19 @@ int main(int argc, char* argv[]) {
      * with simple jacobian (quadratic in arc length differences).
      */
 
-    Log::ReportingLevel() = Log::FromString("INFO");
+    // Add cout as the default logging stream
+    Log::addStream(std::cout);
+    Log::setReportingLevel(LogLevel::INFO);
 
     for(int i = 1; i < argc; i++) {
         // Setting verbosity:
         if(std::string(argv[i]) == "-v") {
-            Log::ReportingLevel() = Log::FromString(std::string(argv[++i]));
-            continue;
+            try {
+                LogLevel log_level = Log::getLevelFromString(std::string(argv[++i]));
+                Log::setReportingLevel(log_level);
+            } catch(std::invalid_argument& e) {
+                LOG(ERROR) << "Invalid verbosity level \"" << std::string(argv[i]) << "\", ignoring overwrite";
+            }
         }
     }
 
@@ -43,7 +49,7 @@ int main(int argc, char* argv[]) {
 
     //----------------------------------------------------------------------------
     // Build the trajectory through the telescope device:
-    LOG(logRESULT) << "Four-plane tracking:";
+    LOG(STATUS) << "Four-plane tracking:";
 
     plane pl0(0, analog_plane, true, resolution_analog);
     plane pl1(20.32, analog_plane, true, resolution_analog);
@@ -63,8 +69,8 @@ int main(int argc, char* argv[]) {
     planes.push_back(pl3);
 
     telescope mytel(planes, BEAM);
-    LOG(logRESULT) << "Track resolution (X) at PAD1: " << mytel.getResolution(2);
-    LOG(logRESULT) << "Track resolution (X) at PAD2: " << mytel.getResolution(3);
+    LOG(STATUS) << "Track resolution (X) at PAD1: " << mytel.getResolution(2);
+    LOG(STATUS) << "Track resolution (X) at PAD2: " << mytel.getResolution(3);
 
     //----------------------------------------------------------------------------
     // Build the trajectory through the telescope device:
@@ -87,12 +93,12 @@ int main(int argc, char* argv[]) {
     yplanes.push_back(ypl3);
 
     telescope ymytel(yplanes, BEAM);
-    LOG(logRESULT) << "Track resolution (Y) at PAD1: " << ymytel.getResolution(2);
-    LOG(logRESULT) << "Track resolution (Y) at PAD2: " << ymytel.getResolution(3);
+    LOG(STATUS) << "Track resolution (Y) at PAD1: " << ymytel.getResolution(2);
+    LOG(STATUS) << "Track resolution (Y) at PAD2: " << ymytel.getResolution(3);
 
     //----------------------------------------------------------------------------
     // Build the trajectory through the telescope device:
-    LOG(logRESULT) << "Two-plane tracking:";
+    LOG(STATUS) << "Two-plane tracking:";
 
     std::vector<plane> aplanes;
     aplanes.push_back(pl0);
@@ -101,8 +107,8 @@ int main(int argc, char* argv[]) {
     aplanes.push_back(pad2);
 
     telescope amytel(aplanes, BEAM);
-    LOG(logRESULT) << "Track resolution (X) at PAD1: " << amytel.getResolution(2);
-    LOG(logRESULT) << "Track resolution (X) at PAD2: " << amytel.getResolution(3);
+    LOG(STATUS) << "Track resolution (X) at PAD1: " << amytel.getResolution(2);
+    LOG(STATUS) << "Track resolution (X) at PAD2: " << amytel.getResolution(3);
 
     //----------------------------------------------------------------------------
     // Build the trajectory through the telescope device:
@@ -114,8 +120,8 @@ int main(int argc, char* argv[]) {
     yaplanes.push_back(ypad2);
 
     telescope yamytel(yaplanes, BEAM);
-    LOG(logRESULT) << "Track resolution (Y) at PAD1: " << yamytel.getResolution(2);
-    LOG(logRESULT) << "Track resolution (Y) at PAD2: " << yamytel.getResolution(3);
+    LOG(STATUS) << "Track resolution (Y) at PAD1: " << yamytel.getResolution(2);
+    LOG(STATUS) << "Track resolution (Y) at PAD2: " << yamytel.getResolution(3);
 
     return 0;
 }

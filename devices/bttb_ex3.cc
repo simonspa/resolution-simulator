@@ -25,13 +25,19 @@ int main(int argc, char* argv[]) {
      * DUT with variable thickness (scan)
      */
 
-    Log::ReportingLevel() = Log::FromString("INFO");
+    // Add cout as the default logging stream
+    Log::addStream(std::cout);
+    Log::setReportingLevel(LogLevel::INFO);
 
     for(int i = 1; i < argc; i++) {
         // Setting verbosity:
         if(std::string(argv[i]) == "-v") {
-            Log::ReportingLevel() = Log::FromString(std::string(argv[++i]));
-            continue;
+            try {
+                LogLevel log_level = Log::getLevelFromString(std::string(argv[++i]));
+                Log::setReportingLevel(log_level);
+            } catch(std::invalid_argument& e) {
+                LOG(ERROR) << "Invalid verbosity level \"" << std::string(argv[i]) << "\", ignoring overwrite";
+            }
         }
     }
 
@@ -95,13 +101,13 @@ int main(int argc, char* argv[]) {
         planes.push_back(dut1);
         telescope mytel1(planes, BEAM);
         // Get the resolution at plane-vector position (x):
-        LOG(logRESULT) << "Track resolution at DUT with plane dist " << dist << "mm " << mytel1.getResolution(3);
+        LOG(STATUS) << "Track resolution at DUT with plane dist " << dist << "mm " << mytel1.getResolution(3);
         resolution->SetPoint(static_cast<int>(dist - 20), dist, mytel1.getResolution(3));
 
         planes.pop_back();
         planes.push_back(dut2);
         telescope mytel2(planes, BEAM);
-        LOG(logRESULT) << "Track resolution at DUT with plane dist " << dist << "mm " << mytel2.getResolution(3);
+        LOG(STATUS) << "Track resolution at DUT with plane dist " << dist << "mm " << mytel2.getResolution(3);
         resolution2->SetPoint(static_cast<int>(dist - 20), dist, mytel2.getResolution(3));
     }
 

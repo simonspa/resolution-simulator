@@ -23,7 +23,9 @@ int main(int, char**) {
      * Evaluate resolution at the scatterer
      */
 
-    Log::ReportingLevel() = Log::FromString("DEBUG");
+    // Add cout as the default logging stream
+    Log::addStream(std::cout);
+    Log::setReportingLevel(LogLevel::INFO);
 
     //----------------------------------------------------------------------------
     // Preparation of the telescope and beam properties:
@@ -70,10 +72,10 @@ int main(int, char**) {
     telescope mytel(planes, BEAM);
 
     // Get the resolution at plane-vector position (x):
-    LOG(logRESULT) << "Track resolution at SCAT with " << SCAT << "% X0: " << mytel.getResolution(3) << "um";
+    LOG(STATUS) << "Track resolution at SCAT with " << SCAT << "% X0: " << mytel.getResolution(3) << "um";
 
-    LOG(logRESULT) << "Track resolution at first telescope planes: " << mytel.getResolution(0) << "um";
-    LOG(logRESULT) << "Track resolution at  last telescope planes: " << mytel.getResolution(6) << "um";
+    LOG(STATUS) << "Track resolution at first telescope planes: " << mytel.getResolution(0) << "um";
+    LOG(STATUS) << "Track resolution at  last telescope planes: " << mytel.getResolution(6) << "um";
 
     return 0;
 }

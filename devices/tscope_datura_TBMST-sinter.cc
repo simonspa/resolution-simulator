@@ -24,13 +24,19 @@ int main(int argc, char* argv[]) {
      * DUT with variable thickness (scan)
      */
 
-    Log::ReportingLevel() = Log::FromString("DEBUG");
+    // Add cout as the default logging stream
+    Log::addStream(std::cout);
+    Log::setReportingLevel(LogLevel::INFO);
 
     for(int i = 1; i < argc; i++) {
         // Setting verbosity:
         if(std::string(argv[i]) == "-v") {
-            Log::ReportingLevel() = Log::FromString(std::string(argv[++i]));
-            continue;
+            try {
+                LogLevel log_level = Log::getLevelFromString(std::string(argv[++i]));
+                Log::setReportingLevel(log_level);
+            } catch(std::invalid_argument& e) {
+                LOG(ERROR) << "Invalid verbosity level \"" << std::string(argv[i]) << "\", ignoring overwrite";
+            }
         }
     }
 
@@ -104,10 +110,10 @@ int main(int argc, char* argv[]) {
         telescope mytel(planes, BEAM);
 
         // Get the resolution at plane-vector position (x):
-        LOG(logRESULT) << "Track resolution at DUT with " << dut_x0 << "% X0: " << mytel.getResolution(3);
+        LOG(STATUS) << "Track resolution at DUT with " << dut_x0 << "% X0: " << mytel.getResolution(3);
         resolution->Fill(DIST_down, mytel.getResolution(3), 1);
 
-        LOG(logRESULT) << "Kink resolution  at DUT with " << dut_x0 << "% X0: " << mytel.getKinkResolution(3);
+        LOG(STATUS) << "Kink resolution  at DUT with " << dut_x0 << "% X0: " << mytel.getKinkResolution(3);
         kink_resolution->Fill(DIST_down, mytel.getKinkResolution(3), 1);
 
         datura.clear();

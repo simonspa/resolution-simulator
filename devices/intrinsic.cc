@@ -26,13 +26,19 @@ int main(int argc, char* argv[]) {
      * with simple jacobian (quadratic in arc length differences).
      */
 
-    Log::ReportingLevel() = Log::FromString("INFO");
+    // Add cout as the default logging stream
+    Log::addStream(std::cout);
+    Log::setReportingLevel(LogLevel::INFO);
 
     for(int i = 1; i < argc; i++) {
         // Setting verbosity:
         if(std::string(argv[i]) == "-v") {
-            Log::ReportingLevel() = Log::FromString(std::string(argv[++i]));
-            continue;
+            try {
+                LogLevel log_level = Log::getLevelFromString(std::string(argv[++i]));
+                Log::setReportingLevel(log_level);
+            } catch(std::invalid_argument& e) {
+                LOG(ERROR) << "Invalid verbosity level \"" << std::string(argv[i]) << "\", ignoring overwrite";
+            }
         }
     }
 
@@ -77,8 +83,8 @@ int main(int argc, char* argv[]) {
         planes.push_back(pl3);
 
         telescope mytel(planes, BEAM);
-        LOG(logRESULT) << "Intrinsic: " << resolution << " Track PAD1: " << mytel.getResolution(2);
-        LOG(logRESULT) << "Intrinsic: " << resolution << " Track PAD2: " << mytel.getResolution(3) << endl;
+        LOG(STATUS) << "Intrinsic: " << resolution << " Track PAD1: " << mytel.getResolution(2);
+        LOG(STATUS) << "Intrinsic: " << resolution << " Track PAD2: " << mytel.getResolution(3) << endl;
         resolution_pad1->Fill(resolution, mytel.getResolution(2), 1);
         resolution_pad2->Fill(resolution, mytel.getResolution(3), 1);
     }

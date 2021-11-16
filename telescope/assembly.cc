@@ -60,7 +60,7 @@ plane::plane() : plane(0, false, 0, false, std::make_pair(0.0, 0.0), 0.0) {}
 
 telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, double material)
     : m_volumeMaterial(material), m_parameter(5) {
-    LOG(logINFO) << "Received " << planes.size() << " planes.";
+    LOG(INFO) << "Received " << planes.size() << " planes.";
 
     // Make sure they are ordered in z by sorting the planes vector:
     std::sort(planes.begin(), planes.end());
@@ -77,11 +77,11 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, doub
     if(pl->m_measurement) {
         m_listOfPoints.push_back(getPoint(
             pl->m_position, pl->m_resolution, getScatterer(beam_energy, pl->m_materialbudget, total_materialbudget)));
-        LOG(logDEBUG) << "Added plane at " << arclength << " (scatterer + measurement)";
+        LOG(DEBUG) << "Added plane at " << arclength << " (scatterer + measurement)";
     } else {
         m_listOfPoints.push_back(
             getPoint(pl->m_position, getScatterer(beam_energy, pl->m_materialbudget, total_materialbudget)));
-        LOG(logDEBUG) << "Added plane at " << arclength << " (scatterer)";
+        LOG(DEBUG) << "Added plane at " << arclength << " (scatterer)";
     }
     oldpos = pl->m_position;
     // Advance the iterator:
@@ -95,7 +95,7 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, doub
 
         // Let's first add the air:
         double plane_distance = pl->m_position - oldpos;
-        LOG(logDEBUG2) << "Distance to next plane: " << plane_distance;
+        LOG(TRACE) << "Distance to next plane: " << plane_distance;
         double distance = 0;
         double size = NAN;
 
@@ -108,7 +108,7 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, doub
             // Add volume scatterer:
             m_listOfPoints.push_back(getPoint(
                 distance, getScatterer(beam_energy, 0.5 * plane_distance / m_volumeMaterial, total_materialbudget)));
-            LOG(logDEBUG3) << "Added volume scat at " << arclength;
+            LOG(TRACE) << "Added volume scat at " << arclength;
 
             // Propagate [mm] 0.58 = from 0.21 to 0.79 = 0.5 + 1/sqrt(12)
             distance = 0.58 * plane_distance;
@@ -117,12 +117,12 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, doub
             // Factor 0.5 for the volume as it is split into two scatterers:
             m_listOfPoints.push_back(getPoint(
                 distance, getScatterer(beam_energy, 0.5 * plane_distance / m_volumeMaterial, total_materialbudget)));
-            LOG(logDEBUG3) << "Added volume scat at " << arclength;
+            LOG(TRACE) << "Added volume scat at " << arclength;
 
             // Propagate [mm] from 0 to 0.21 = 0.5 - 1/sqrt(12)
             distance = 0.21 * plane_distance;
             arclength += distance;
-            LOG(logDEBUG) << "Added volume scatterers.";
+            LOG(DEBUG) << "Added volume scatterers.";
         } else {
             // No volume scatterer defined (vacuum), simply propagate to the next plane:
             distance = plane_distance;
@@ -139,31 +139,31 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, doub
                 addDer(1, 1) = (arclength - (arcDUT + size / sqrt(12))); //
                 addDer(0, 2) = (arclength - (arcDUT - size / sqrt(12))); // second scatterer in target
                 addDer(1, 2) = (arclength - (arcDUT - size / sqrt(12))); //
-                LOG(logDEBUG) << " size = " << size
-                              << " lever arm left DUT-point = " << (arclength - (arcDUT + size / sqrt(12)))
-                              << " and lever arm right DUT-point = " << (arclength - (arcDUT - size / sqrt(12)));
+                LOG(DEBUG) << " size = " << size
+                           << " lever arm left DUT-point = " << (arclength - (arcDUT + size / sqrt(12)))
+                           << " and lever arm right DUT-point = " << (arclength - (arcDUT - size / sqrt(12)));
 
                 point.addLocals(addDer);
             }
             m_listOfPoints.push_back(point);
-            LOG(logDEBUG) << "Added plane at " << arclength << " (scatterer + measurement)";
+            LOG(DEBUG) << "Added plane at " << arclength << " (scatterer + measurement)";
             if(arcDUT > 0) {
-                LOG(logDEBUG) << "                        + local derivative)";
+                LOG(DEBUG) << "                        + local derivative)";
             }
         } else if(!pl->m_measurement && pl->m_size < 0.0) {
             m_listOfPoints.push_back(
                 getPoint(distance, getScatterer(beam_energy, pl->m_materialbudget, total_materialbudget)));
-            LOG(logDEBUG) << "Added plane at " << arclength << " (scatterer)";
+            LOG(DEBUG) << "Added plane at " << arclength << " (scatterer)";
         } else if(pl->m_size >= 0.0 && arcDUT < 0) {
-            LOG(logINFO) << " adding unknown scatterer at " << arclength
-                         << ". Adding local derivatives for subsequent measurement points!! ";
+            LOG(INFO) << " adding unknown scatterer at " << arclength
+                      << ". Adding local derivatives for subsequent measurement points!! ";
             arcDUT = arclength;
             size = pl->m_size;
             m_parameter += 4;
         } else if(pl->m_size >= 0.0 && arcDUT > 0) {
-            LOG(logERROR) << " ___________________________________________________________________________________";
-            LOG(logERROR) << " Software only supports one unknown scatterer! Ommitting further unknown scatterers!";
-            LOG(logERROR) << " ___________________________________________________________________________________";
+            LOG(ERROR) << " ___________________________________________________________________________________";
+            LOG(ERROR) << " Software only supports one unknown scatterer! Ommitting further unknown scatterers!";
+            LOG(ERROR) << " ___________________________________________________________________________________";
         }
         // Update position of previous plane:
         oldpos = pl->m_position;
@@ -171,35 +171,35 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, doub
         m_listOfLabels.push_back(m_listOfPoints.size());
     }
 
-    LOG(logDEBUG) << "Finished building trajectory.";
+    LOG(DEBUG) << "Finished building trajectory.";
 }
 
 double telescope::getTotalMaterialBudget(const std::vector<gblsim::plane>& planes) const {
 
-    LOG(logDEBUG) << "Calculating total material budget in the particle path...";
+    LOG(DEBUG) << "Calculating total material budget in the particle path...";
     double total_materialbudget = 0;
 
     // Add the planes as scatterer:
     for(const auto& p : planes) {
-        LOG(logDEBUG2) << "Adding x/X0=" << p.m_materialbudget;
+        LOG(TRACE) << "Adding x/X0=" << p.m_materialbudget;
         total_materialbudget += p.m_materialbudget;
     }
 
     if(m_volumeMaterial > 0.0) {
         // Add the air as scattering material:
         double total_distance = (planes.back().m_position - planes.front().m_position);
-        LOG(logDEBUG2) << "Adding x/X0=" << (total_distance / m_volumeMaterial) << " (air)";
+        LOG(TRACE) << "Adding x/X0=" << (total_distance / m_volumeMaterial) << " (air)";
         total_materialbudget += total_distance / m_volumeMaterial;
     }
 
-    LOG(logDEBUG) << "Total track material budget x/X0=" << total_materialbudget;
+    LOG(DEBUG) << "Total track material budget x/X0=" << total_materialbudget;
     return total_materialbudget;
 }
 
 GblTrajectory telescope::getTrajectory() const {
 
     GblTrajectory traj(m_listOfPoints, 0);
-    IFLOG(logDEBUG2) { traj.printPoints(); }
+    IFLOG(TRACE) { traj.printPoints(); }
     return traj;
 }
 
@@ -211,8 +211,8 @@ std::pair<double, double> telescope::getResolutionXY(size_t plane) const {
     int ndf = 0;
 
     tr.fit(c2, ndf, lw);
-    LOG(logDEBUG2) << " Fit: Chi2=" << c2 << ", Ndf=" << ndf << ", lostWeight=" << lw;
-    IFLOG(logDEBUG2) { tr.printTrajectory(); }
+    LOG(TRACE) << " Fit: Chi2=" << c2 << ", Ndf=" << ndf << ", lostWeight=" << lw;
+    IFLOG(TRACE) { tr.printTrajectory(); }
 
     Eigen::VectorXd aCorr(m_parameter);
     Eigen::MatrixXd aCov(m_parameter, m_parameter);
@@ -236,8 +236,8 @@ std::pair<double, double> telescope::getKinkResolutionXY(size_t plane) const {
     int ndf = 0;
 
     tr.fit(c2, ndf, lw);
-    LOG(logDEBUG2) << " Fit: Chi2=" << c2 << ", Ndf=" << ndf << ", lostWeight=" << lw;
-    IFLOG(logDEBUG2) { tr.printTrajectory(); }
+    LOG(TRACE) << " Fit: Chi2=" << c2 << ", Ndf=" << ndf << ", lostWeight=" << lw;
+    IFLOG(TRACE) { tr.printTrajectory(); }
 
     Eigen::VectorXd aCorr(m_parameter);
     Eigen::MatrixXd aCov(m_parameter, m_parameter);
@@ -257,6 +257,6 @@ double telescope::getKinkResolution(size_t plane) const {
 void telescope::printLabels() const {
 
     for(size_t l = 0; l < m_listOfLabels.size(); l++) {
-        LOG(logDEBUG) << "Plane " << l << " label " << m_listOfLabels.at(l);
+        LOG(DEBUG) << "Plane " << l << " label " << m_listOfLabels.at(l);
     }
 }
