@@ -103,9 +103,9 @@ SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_EXTENSIONS OFF)
 
 
-######################
-# Prerequisistes for #
-######################
+##################
+# Prerequisistes #
+##################
 
 # ROOT is required for vector and persistency etc
 FIND_PACKAGE(ROOT REQUIRED COMPONENTS Geom Core GenVector Hist RIO NO_MODULE)
@@ -132,6 +132,28 @@ ENDIF()
 FIND_PACKAGE(Eigen3 REQUIRED)
 FIND_PACKAGE(GBL REQUIRED)
 
+###################################
+# Load cpp format and check tools #
+###################################
+
+# Set the clang-format version required by the CI for correct formatting:
+SET(CLANG_FORMAT_VERSION "12")
+# Set the clang-tidy version of the linter required by the CI:
+SET(CLANG_TIDY_VERSION "12")
+
+# Set the source files to clang-format (FIXME: determine this better)
+FILE(
+    GLOB_RECURSE
+    CHECK_CXX_SOURCE_FILES
+    devices/*.[tch]pp
+    devices/*.cc
+    devices/*.h
+    telescope/*.[tch]pp
+    telescope/*.cc
+    telescope/*.h
+    utils/*.h)
+
+INCLUDE("cmake/clang-cpp-checks.cmake")
 
 ########################
 # Define build targets #
