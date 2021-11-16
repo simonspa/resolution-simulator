@@ -58,23 +58,23 @@ namespace gblsim {
     gbl::GblTrajectory getTrajectory() const;
 
     // Return the resolution along the first dimension at given plane:
-    double getResolution(int plane) const;
+    double getResolution(size_t plane) const;
     // Return the resolution in both dimensions on the given plane
-    std::pair<double,double> getResolutionXY(int plane) const;
+    std::pair<double,double> getResolutionXY(size_t plane) const;
 
     // Return the kink resolution along the first dimension at given plane:
-    double getKinkResolution(int plane) const;
+    double getKinkResolution(size_t plane) const;
     // Return the kink resolution in both dimensions on the given plane
-    std::pair<double,double> getKinkResolutionXY(int plane) const;
+    std::pair<double,double> getKinkResolutionXY(size_t plane) const;
 
     void printLabels() const;
   private:
     // Radiationlength of the material of the surrounding volume, defaults to dry air:
     double m_volumeMaterial;
-    
+
     double getTotalMaterialBudget(const std::vector<plane>& planes) const;
     std::vector<gbl::GblPoint> m_listOfPoints;
-    std::vector<int> m_listOfLabels;
+    std::vector<size_t> m_listOfLabels;
     unsigned int m_parameter;
   };
 }

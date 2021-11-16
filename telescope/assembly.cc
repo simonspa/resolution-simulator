@@ -56,7 +56,7 @@ plane::plane(double position,
 plane::plane(double position, double material, bool has_measurement, double resolution, double size) :
   plane(position, true, material, has_measurement, std::make_pair(resolution, resolution), size) {}
 
-plane::plane(double position, bool has_scatterer, bool has_measurement, double size) :
+plane::plane(double position, bool, bool, double size) :
   m_measurement(false),
   m_resolution(2),
   m_scatterer(false),
@@ -65,7 +65,7 @@ plane::plane(double position, bool has_scatterer, bool has_measurement, double s
 {
   m_resolution[0] = 0.0;
   m_resolution[1] = 0.0;
-} 
+}
 
 plane::plane() : plane(0, false, 0, false, std::make_pair(0.0, 0.0), 0.0) {}
 
@@ -79,14 +79,14 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, doub
 
     // Make sure they are ordered in z by sorting the planes vector:
   std::sort(planes.begin(),planes.end());
-  
+
   double arclength = 0;
   double oldpos = 0;
   double arcDUT = -1.;
 
   // Calculate the total material budget to correctly estimate the scattering:
   double total_materialbudget = getTotalMaterialBudget(planes);
-  
+
   // Add first plane:
   std::vector<plane>::iterator pl = planes.begin();
   if(pl->m_measurement) {
@@ -105,14 +105,14 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, doub
   m_listOfLabels.push_back(m_listOfPoints.size());
 
   // All planes except first:
-  for(pl; pl != planes.end(); pl++) {
+  for(; pl != planes.end(); pl++) {
 
     // Let's first add the air:
     double plane_distance = pl->m_position - oldpos;
     LOG(logDEBUG2) << "Distance to next plane: " << plane_distance;
     double distance = 0;
     double size;
-    
+
     // Check if a volume scatterer with radiation length != 0 has been defined:
     if(m_volumeMaterial > 0.0) {
       // Propagate [mm] from 0 to 0.21 = 0.5 - 1/sqrt(12)
@@ -137,7 +137,7 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, doub
       // No volume scatterer defined (vacuum), simply propagate to the next plane:
       distance = plane_distance;
     }
-    
+
     if(pl->m_measurement) {
       gbl::GblPoint point(getPoint(distance,pl->m_resolution,getScatterer(beam_energy,pl->m_materialbudget,total_materialbudget)));
       //m_listOfPoints.push_back(getPoint(distance,pl->m_resolution,getScatterer(beam_energy,pl->m_materialbudget,total_materialbudget)));
@@ -145,18 +145,20 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, doub
       addDer.setZero();
       if(arcDUT > 0) {
         addDer(0,0) = (arclength - (arcDUT + size/sqrt(12))); // First scatterer in target
-	addDer(1,1) = (arclength - (arcDUT + size/sqrt(12))); //
-	addDer(0,2) = (arclength - (arcDUT - size/sqrt(12))); // second scatterer in target
-	addDer(1,3) = (arclength - (arcDUT - size/sqrt(12))); //
-	LOG(logDEBUG) << " size = "        <<  size
-		      << " lever arm left DUT-point = "      << (arclength - (arcDUT + size/sqrt(12))) 
+        addDer(1,1) = (arclength - (arcDUT + size/sqrt(12))); //
+        addDer(0,2) = (arclength - (arcDUT - size/sqrt(12))); // second scatterer in target
+        addDer(1,2) = (arclength - (arcDUT - size/sqrt(12))); //
+        LOG(logDEBUG) << " size = "        <<  size
+		      << " lever arm left DUT-point = "      << (arclength - (arcDUT + size/sqrt(12)))
 		      << " and lever arm right DUT-point = " << (arclength - (arcDUT - size/sqrt(12)));
 
-        point.addLocals(addDer); 
+        point.addLocals(addDer);
       }
       m_listOfPoints.push_back(point);
       LOG(logDEBUG) << "Added plane at " << arclength << " (scatterer + measurement)";
-      if(arcDUT > 0) LOG(logDEBUG) << "                        + local derivative)";
+      if(arcDUT > 0) {
+        LOG(logDEBUG) << "                        + local derivative)";
+      }
     }
     else if (!pl->m_measurement && pl->m_size < 0.0) {
       m_listOfPoints.push_back(getPoint(distance,getScatterer(beam_energy,pl->m_materialbudget,total_materialbudget)));
@@ -200,7 +202,7 @@ double telescope::getTotalMaterialBudget(const std::vector<gblsim::plane>& plane
     LOG(logDEBUG2) << "Adding x/X0=" << (total_distance/m_volumeMaterial) << " (air)";
     total_materialbudget += total_distance/m_volumeMaterial;
   }
-  
+
   LOG(logDEBUG) << "Total track material budget x/X0=" << total_materialbudget;
   return total_materialbudget;
 }
@@ -212,7 +214,7 @@ GblTrajectory telescope::getTrajectory() const {
   return traj;
 }
 
-std::pair<double,double> telescope::getResolutionXY(int plane) const {
+std::pair<double,double> telescope::getResolutionXY(size_t plane) const {
 
   GblTrajectory tr = getTrajectory();
 
@@ -228,21 +230,20 @@ std::pair<double,double> telescope::getResolutionXY(int plane) const {
 
   // Get resolution at position of the DUT:
   if(plane < m_listOfLabels.size()) {
-    tr.getResults(m_listOfLabels.at(plane), aCorr, aCov);
+    tr.getResults(static_cast<int>(m_listOfLabels.at(plane)), aCorr, aCov);
   }
   return std::make_pair(sqrt(aCov(3,3))*1E3,sqrt(aCov(4,4))*1E3);
 }
 
-double telescope::getResolution(int plane) const {
+double telescope::getResolution(size_t plane) const {
   return std::get<0>(getResolutionXY(plane));
 }
 
-std::pair<double,double> telescope::getKinkResolutionXY(int plane) const {
+std::pair<double,double> telescope::getKinkResolutionXY(size_t plane) const {
 
   GblTrajectory tr = getTrajectory();
 
   double c2, lw;
-  unsigned int ndata = 2;
   int ndf;
 
   tr.fit(c2, ndf, lw);
@@ -254,12 +255,12 @@ std::pair<double,double> telescope::getKinkResolutionXY(int plane) const {
 
   // Get resolution at position of the DUT:
   if(plane < m_listOfLabels.size()) {
-    tr.getResults(m_listOfLabels.at(plane), aCorr, aCov);
+    tr.getResults(static_cast<int>(m_listOfLabels.at(plane)), aCorr, aCov);
   }
   return std::make_pair( sqrt(aCov(5,5) + aCov(7,7) + 2*aCov(5,7))*1E6, sqrt( sqrt(aCov(6,6) + aCov(8,8) + 2*aCov(6,8) )*1E6) );
 }
 
-double telescope::getKinkResolution(int plane) const {
+double telescope::getKinkResolution(size_t plane) const {
   return std::get<0>(getKinkResolutionXY(plane));
 }
 
