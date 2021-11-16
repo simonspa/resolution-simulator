@@ -1,10 +1,10 @@
-#include "TMatrixD.h"
-#include "TVectorD.h"
+#include <Eigen/Core>
+
 #include "GblTrajectory.h"
 #include "GblData.h"
 
 namespace gblsim {
-  
+
   gbl::Matrix5d Jac5(double ds);
   double getTheta(double energy, double radlength, double total_radlength);
   Eigen::Vector2d getScatterer(double energy, double radlength, double total_radlength);

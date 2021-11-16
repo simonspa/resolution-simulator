@@ -1,9 +1,9 @@
 // Simon Spannagel (DESY) January 2016
 
-#include "TCanvas.h"
-#include "TProfile.h"
-#include "TString.h"
-#include "TFile.h"
+#include <TCanvas.h>
+#include <TProfile.h>
+#include <TString.h>
+#include <TFile.h>
 
 #include "assembly.h"
 #include "propagate.h"
@@ -23,15 +23,15 @@ int main(int argc, char* argv[]) {
    * DUT with variable thickness (scan)
    */
 
-  
+
   Log::ReportingLevel() = Log::FromString("INFO");
 
   for (int i = 1; i < argc; i++) {
     // Setting verbosity:
-    if (std::string(argv[i]) == "-v") { 
+    if (std::string(argv[i]) == "-v") {
       Log::ReportingLevel() = Log::FromString(std::string(argv[++i]));
       continue;
-    } 
+    }
   }
 
   TFile * out = TFile::Open("datura-resolution.root","RECREATE");
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
   //  |    |    |        |        |    |    |
   //  |<-->|    |<------>|<------>|    |    |
   //   DIST      DUT_DIST DUT_DIST
-  
+
   // Distance between telescope planes in mm:
   double DIST = 20;
   // Distance of telescope arms and DUT assembly:
@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
   // Build a vector of all telescope planes:
   std::vector<plane> datura;
   double position = 0;
-  
+
   // Upstream telescope arm:
   for(int i = 0; i < 3; i++) {
     datura.push_back(plane(position,MIM26,true,RES));
@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
   resolution->SetLineColor(kRed+1);
   resolution->SetLineWidth(2);
   resolution->SetMarkerColor(kRed+1);
-  
+
   resolution->Draw();
   c1->Write();
 
