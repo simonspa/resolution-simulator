@@ -2,12 +2,14 @@
 // Hendrik Jansen (DESY) August 2018
 
 #include "assembly.h"
+
 #include "constants.h"
 #include "log.h"
 #include "materials.h"
 #include "propagate.h"
 
 #include <algorithm>
+#include <cmath>
 
 using namespace gblsim;
 using namespace unilog;
@@ -57,7 +59,7 @@ plane::plane(double position, bool, bool, double size)
 plane::plane() : plane(0, false, 0, false, std::make_pair(0.0, 0.0), 0.0) {}
 
 telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, double material)
-    : m_volumeMaterial(material), m_listOfPoints(), m_listOfLabels(), m_parameter(5) {
+    : m_volumeMaterial(material), m_parameter(5) {
     LOG(logINFO) << "Received " << planes.size() << " planes.";
 
     // Make sure they are ordered in z by sorting the planes vector:
@@ -71,7 +73,7 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, doub
     double total_materialbudget = getTotalMaterialBudget(planes);
 
     // Add first plane:
-    std::vector<plane>::iterator pl = planes.begin();
+    auto pl = planes.begin();
     if(pl->m_measurement) {
         m_listOfPoints.push_back(getPoint(
             pl->m_position, pl->m_resolution, getScatterer(beam_energy, pl->m_materialbudget, total_materialbudget)));
@@ -95,7 +97,7 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, doub
         double plane_distance = pl->m_position - oldpos;
         LOG(logDEBUG2) << "Distance to next plane: " << plane_distance;
         double distance = 0;
-        double size;
+        double size = NAN;
 
         // Check if a volume scatterer with radiation length != 0 has been defined:
         if(m_volumeMaterial > 0.0) {
@@ -205,8 +207,8 @@ std::pair<double, double> telescope::getResolutionXY(size_t plane) const {
 
     GblTrajectory tr = getTrajectory();
 
-    double c2, lw;
-    int ndf;
+    double c2 = NAN, lw = NAN;
+    int ndf = 0;
 
     tr.fit(c2, ndf, lw);
     LOG(logDEBUG2) << " Fit: Chi2=" << c2 << ", Ndf=" << ndf << ", lostWeight=" << lw;
@@ -230,8 +232,8 @@ std::pair<double, double> telescope::getKinkResolutionXY(size_t plane) const {
 
     GblTrajectory tr = getTrajectory();
 
-    double c2, lw;
-    int ndf;
+    double c2 = NAN, lw = NAN;
+    int ndf = 0;
 
     tr.fit(c2, ndf, lw);
     LOG(logDEBUG2) << " Fit: Chi2=" << c2 << ", Ndf=" << ndf << ", lostWeight=" << lw;
