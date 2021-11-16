@@ -25,15 +25,15 @@ int main(int argc, char* argv[]) {
    * DUT with variable thickness (scan)
    */
 
-  
+
   Log::ReportingLevel() = Log::FromString("INFO");
 
   for (int i = 1; i < argc; i++) {
     // Setting verbosity:
-    if (std::string(argv[i]) == "-v") { 
+    if (std::string(argv[i]) == "-v") {
       Log::ReportingLevel() = Log::FromString(std::string(argv[++i]));
       continue;
-    } 
+    }
   }
 
   TFile * out = TFile::Open("datura-plane-distance.root","RECREATE");
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
   //  |    |    |        |        |    |    |
   //  |<-->|    |<------>|<------>|    |    |
   //   DIST      DUT_DIST DUT_DIST
-  
+
   // Distance of telescope arms and DUT assembly:
   double DUT_DIST = 20;
 
@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
   double DUT_X0_1 = 0.001;
   double DUT_X0_2 = 0.01;
 
-    
+
   //----------------------------------------------------------------------------
   // Build the trajectory through the telescope device:
 
@@ -99,20 +99,20 @@ int main(int argc, char* argv[]) {
     telescope mytel1(planes, BEAM);
     // Get the resolution at plane-vector position (x):
     LOG(logRESULT) << "Track resolution at DUT with plane dist " << dist << "mm " << mytel1.getResolution(3);
-    resolution->SetPoint(dist-20,dist,mytel1.getResolution(3));
-    
+    resolution->SetPoint(static_cast<int>(dist-20),dist,mytel1.getResolution(3));
+
     planes.pop_back();
     planes.push_back(dut2);
     telescope mytel2(planes, BEAM);
     LOG(logRESULT) << "Track resolution at DUT with plane dist " << dist << "mm " << mytel2.getResolution(3);
-    resolution2->SetPoint(dist-20,dist,mytel2.getResolution(3));
+    resolution2->SetPoint(static_cast<int>(dist-20),dist,mytel2.getResolution(3));
   }
-  
+
   c1->cd();
   resolution->SetTitle("DATURA Track Resolution at DUT;DATURA plane distance #left[mm#right];resolution at DUT #left[#mum#right]");
   resolution->GetYaxis()->SetRangeUser(1.5,3.5);
-  resolution->GetYaxis()->SetTitleOffset(1.3);
-  resolution->GetXaxis()->SetTitleOffset(1.3);
+  resolution->GetYaxis()->SetTitleOffset(1.3f);
+  resolution->GetXaxis()->SetTitleOffset(1.3f);
 
   resolution->SetMarkerStyle(0);
   resolution->SetLineColor(kRed+1);
@@ -132,7 +132,7 @@ int main(int argc, char* argv[]) {
   leg->AddEntry(resolution2,"DUT with  0.01% X_{0}","l");
   leg->SetTextFont(42);
   leg->SetTextAlign(12);
-  leg->SetTextSize(0.04);
+  leg->SetTextSize(0.04f);
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
 
@@ -141,6 +141,7 @@ int main(int argc, char* argv[]) {
   leg->Draw();
 
   c1->Write();
+  out->Close();
 
   return 0;
 }

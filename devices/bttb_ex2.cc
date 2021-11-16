@@ -10,20 +10,20 @@ using namespace std;
 using namespace gblsim;
 using namespace unilog;
 
-int main(int argc, char* argv[]) {
+int main(int, char**) {
 
   /*
    * Telescope resolution simulation for the BTTB5 hands-on exercise 1
    * Beam energy 5GeV
    *
-   * Six pixel detectors with 55mm equidistant spacing, 
+   * Six pixel detectors with 55mm equidistant spacing,
    * Intrinsic sensor resolution 4.5um, thickness 70um Silicon
    *
    * Additional Silicon scatterer at the center of the telescope, 700um
    * Evaluate resolution at the scatterer
    */
 
-  
+
   Log::ReportingLevel() = Log::FromString("DEBUG");
 
   //----------------------------------------------------------------------------
@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
   //     DIST          DIST/2 DIST/2
   //  Measure:               X                      X
 
-  
+
   // Distance between telescope planes in mm:
   double DIST = 55;
 

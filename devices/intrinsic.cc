@@ -26,15 +26,15 @@ int main(int argc, char* argv[]) {
    * with simple jacobian (quadratic in arc length differences).
    */
 
-  
+
   Log::ReportingLevel() = Log::FromString("INFO");
 
   for (int i = 1; i < argc; i++) {
     // Setting verbosity:
-    if (std::string(argv[i]) == "-v") { 
+    if (std::string(argv[i]) == "-v") {
       Log::ReportingLevel() = Log::FromString(std::string(argv[++i]));
       continue;
-    } 
+    }
   }
 
   TFile * out = TFile::Open("pad-vs-intrinsic-resolution.root","RECREATE");
@@ -46,17 +46,17 @@ int main(int argc, char* argv[]) {
 
   //----------------------------------------------------------------------------
   // Preparation of the particle trajectory:
-  
+
   // Telescope properties:
   double analog_plane = 285e-3 / X0_Si + 500e-3 / X0_Si + 700e-3 / X0_PCB;
   double diamond_pad = 20e-3 / X0_Al + 500e-3 / X0_Diamond + 20e-3 / X0_Al;
 
   // Beam: 250 MeV Pi at PSI
   double BEAM = 0.250;
-  
+
   // Loop over possible intrinsic pixel plane resolutions [um]
   for(double resolution = 5; resolution < 55; resolution++) {
-    
+
     //----------------------------------------------------------------------------
     // Build the trajectory through the telescope device:
 
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
 
     plane pad1(32,diamond_pad,false);
     plane pad2(51,diamond_pad,false);
-    
+
     plane pl2(81.28,analog_plane,true,resolution*1e-3);
     plane pl3(101.6,analog_plane,true,resolution*1e-3);
 
@@ -93,10 +93,12 @@ int main(int argc, char* argv[]) {
   resolution_pad2->SetLineColor(kBlack);
   resolution_pad1->SetMarkerColor(kRed+1);
   resolution_pad2->SetMarkerColor(kBlack);
-  
+
   resolution_pad1->Draw();
   resolution_pad2->Draw("same");
   c1->Write();
+
+  out->Close();
 
   return 0;
 }
