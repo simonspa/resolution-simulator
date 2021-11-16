@@ -14,6 +14,13 @@ PROJECT(telressim VERSION 2.99 LANGUAGES CXX)
 # Setup the build environment #
 ###############################
 
+# Set default build type
+IF(NOT CMAKE_BUILD_TYPE)
+    SET(CMAKE_BUILD_TYPE
+        "RelWithDebInfo"
+        CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+ENDIF(NOT CMAKE_BUILD_TYPE)
+
 # Additional packages to be searched for by cmake
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
