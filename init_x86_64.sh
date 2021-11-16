@@ -1,14 +1,27 @@
 #!/bin/bash
 
 # Determine which OS you are using
-if [ "$(uname)" == "Linux" ]; then
-    if [ "$( cat /etc/*-release | grep Scientific )" ]; then
-        OS=slc6
-    elif [ "$( cat /etc/*-release | grep CentOS )" ]; then
+if [ "$(uname)" = "Linux" ]; then
+    if [ "$( cat /etc/*-release | grep "CentOS Linux 7" )" ]; then
+        echo "Detected CentOS Linux 7"
         OS=centos7
+    elif [ "$( cat /etc/*-release | grep "CentOS Linux 8" )" ] || [ "$( cat /etc/*-release | grep "CentOS Stream release 8" )" ]; then
+        echo "Detected CentOS Linux 8"
+        OS=centos8
     else
-        echo "Cannot detect OS, falling back to CERN Centos 7"
+        echo "Cannot detect OS, falling back to CentOS7"
         OS=centos7
+    fi
+elif [ "$(uname)" = "Darwin" ]; then
+    MACOS_MAJOR=$(sw_vers -productVersion | awk -F '.' '{print $1}')
+    MACOS_MINOR=$(sw_vers -productVersion | awk -F '.' '{print $2}')
+    if [ $MACOS_MAJOR = "11" ]; then
+        OS=mac11
+    elif [ "${MACOS_MAJOR}.${MACOS_MINOR}" = "10.15" ]; then
+        OS=mac1015
+    else
+        echo "Unsupported version of macOS ${MACOS_MAJOR}.${MACOS_MINOR}"
+        exit 1
     fi
 else
     echo "Unknown OS"
@@ -16,28 +29,45 @@ else
 fi
 
 # Determine is you have CVMFS installed
-if [ ! -d "/cvmfs" ]; then
-    echo "No CVMFS detected, please install it."
+CVMFS_MOUNT=""
+if [ "$OS" = mac1015 ] || [ "$OS" = mac11 ] ; then
+    CVMFS_MOUNT="/Users/Shared"
+fi
+
+if [ ! -d "${CVMFS_MOUNT}/cvmfs" ]; then
+    echo "No CVMFS detected, please install it. Looking at ${CVMFS_MOUNT}/cvmfs"
     exit 1
 fi
 
-if [ ! -d "/cvmfs/clicdp.cern.ch" ]; then
-    echo "No clicdp CVMFS repository detected, please add it."
-    exit 1
+# Determine which LCG version to use
+DEFAULT_LCG="LCG_101"
+
+if [ -z ${RES_LCG_VERSION} ]; then
+    echo "No explicit LCG version set, using ${DEFAULT_LCG}."
+    RES_LCG_VERSION=${DEFAULT_LCG}
 fi
 
 # Determine which compiler to use
 if [ -z ${COMPILER_TYPE} ]; then
-    echo "No compiler type set, falling back to GCC."
-    COMPILER_TYPE="gcc"
+    if [ "$(uname)" = "Darwin" ]; then
+        COMPILER_TYPE="llvm"
+        echo "No compiler type set, falling back to AppleClang."
+    else
+        echo "No compiler type set, falling back to GCC."
+        COMPILER_TYPE="gcc"
+    fi
 fi
-if [ ${COMPILER_TYPE} == "gcc" ]; then
-    echo "Compiler type set to GCC."
-    COMPILER_VERSION="gcc8"
+if [ ${COMPILER_TYPE} = "gcc" ]; then
+    COMPILER_VERSION="gcc11"
+    echo "Compiler type set to GCC, version ${COMPILER_VERSION}."
 fi
-if [ ${COMPILER_TYPE} == "llvm" ]; then
-    echo "Compiler type set to LLVM."
-    COMPILER_VERSION="llvm6"
+if [ ${COMPILER_TYPE} = "llvm" ]; then
+    if [ "$(uname)" = "Darwin" ]; then
+        COMPILER_VERSION="clang120"
+    else
+        COMPILER_VERSION="clang12"
+    fi
+    echo "Compiler type set to LLVM, version ${COMPILER_VERSION}."
 fi
 
 # Choose build type
@@ -46,48 +76,19 @@ if [ -z ${BUILD_TYPE} ]; then
 fi
 
 # General variables
-CLICREPO=/cvmfs/clicdp.cern.ch
+SFTREPO=${CVMFS_MOUNT}/cvmfs/sft.cern.ch
 export BUILD_FLAVOUR=x86_64-${OS}-${COMPILER_VERSION}-${BUILD_TYPE}
 
 #--------------------------------------------------------------------------------
-#     Compiler
+#     Source dependencies
 #--------------------------------------------------------------------------------
 
-if [ ${COMPILER_TYPE} == "gcc" ]; then
-    source ${CLICREPO}/compilers/gcc/8.1.0/x86_64-${OS}/setup.sh
+export LCG_VIEW=${SFTREPO}/lcg/views/${RES_LCG_VERSION}/${BUILD_FLAVOUR}/setup.sh
+source ${LCG_VIEW} || echo "yes"
+
+if [ -n "${CI}" ] && [ "$(uname)" = "Darwin" ]; then
+    source $ROOTSYS/bin/thisroot.sh
+    cd $G4INSTALL/bin/
+    source geant4.sh
+    cd -
 fi
-if [ ${COMPILER_TYPE} == "llvm" ]; then
-    source ${CLICREPO}/compilers/llvm/6.0.0/x86_64-${OS}/setup.sh
-fi
-
-#--------------------------------------------------------------------------------
-#     CMake
-#--------------------------------------------------------------------------------
-
-export CMAKE_HOME=${CLICREPO}/software/CMake/3.11.1/${BUILD_FLAVOUR}
-export PATH=${CMAKE_HOME}/bin:$PATH
-
-#--------------------------------------------------------------------------------
-#     ROOT
-#--------------------------------------------------------------------------------
-
-export ROOTSYS=${CLICREPO}/software/ROOT/6.12.06/${BUILD_FLAVOUR}
-export PYTHONPATH="$ROOTSYS/lib:$PYTHONPATH"
-export PATH="$ROOTSYS/bin:$PATH"
-export LD_LIBRARY_PATH="$ROOTSYS/lib:$LD_LIBRARY_PATH"
-export CMAKE_PREFIX_PATH="$ROOTSYS:$CMAKE_PREFIX_PATH"
-
-#--------------------------------------------------------------------------------
-#     Eigen
-#--------------------------------------------------------------------------------
-
-export Eigen_HOME=${CLICREPO}/software/Eigen/3.3.4/${BUILD_FLAVOUR}/
-export Eigen3_DIR=${Eigen_HOME}/share/eigen3/cmake/
-export CMAKE_PREFIX_PATH="$Eigen3_DIR:$CMAKE_PREFIX_PATH"
-
-#--------------------------------------------------------------------------------
-#     GeneralBrokenLines
-#--------------------------------------------------------------------------------
-
-export GBLPATH=${CLICREPO}/software/GeneralBrokenLines/2.1.3/${BUILD_FLAVOUR}/
-export CMAKE_PREFIX_PATH="$GBLPATH:$CMAKE_PREFIX_PATH"
