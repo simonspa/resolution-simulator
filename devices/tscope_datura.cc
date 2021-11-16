@@ -36,8 +36,8 @@ int main(int argc, char* argv[]) {
     TFile* out = TFile::Open("datura-resolution.root", "RECREATE");
     gDirectory->pwd();
 
-    TCanvas* c1 = new TCanvas("c1", "resolution", 700, 700);
-    TProfile* resolution = new TProfile("resolution", " ", 100, 0, 0.02);
+    auto* c1 = new TCanvas("c1", "resolution", 700, 700);
+    auto* resolution = new TProfile("resolution", " ", 100, 0, 0.02);
 
     //----------------------------------------------------------------------------
     // Preparation of the telescope and beam properties:
@@ -70,14 +70,14 @@ int main(int argc, char* argv[]) {
 
     // Upstream telescope arm:
     for(int i = 0; i < 3; i++) {
-        datura.push_back(plane(position, MIM26, true, RES));
+        datura.emplace_back(position, MIM26, true, RES);
         position += DIST;
     }
 
     // Downstream telescope arm:
     position = 2 * DIST + 2 * DUT_DIST;
     for(int i = 0; i < 3; i++) {
-        datura.push_back(plane(position, MIM26, true, RES));
+        datura.emplace_back(position, MIM26, true, RES);
         position += DIST;
     }
 

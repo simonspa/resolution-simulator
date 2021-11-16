@@ -59,12 +59,12 @@ int main(int, char**) {
 
     // Add all six planes:
     for(int i = 0; i < 6; i++) {
-        planes.push_back(plane(position, PXL, true, RES));
+        planes.emplace_back(position, PXL, true, RES);
         position += DIST;
     }
 
     // Add the additional material (no measurement, just scatterer
-    planes.push_back(plane(2.5 * DIST, SCAT, false));
+    planes.emplace_back(2.5 * DIST, SCAT, false);
 
     // Build the telescope:
     telescope mytel(planes, BEAM);

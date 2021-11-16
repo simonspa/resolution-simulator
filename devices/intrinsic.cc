@@ -39,9 +39,9 @@ int main(int argc, char* argv[]) {
     TFile* out = TFile::Open("pad-vs-intrinsic-resolution.root", "RECREATE");
     gDirectory->pwd();
 
-    TCanvas* c1 = new TCanvas("c1", "resolution", 700, 700);
-    TProfile* resolution_pad1 = new TProfile("resolution_p1", " ", 50, 5, 55);
-    TProfile* resolution_pad2 = new TProfile("resolution_p2", " ", 50, 5, 55);
+    auto* c1 = new TCanvas("c1", "resolution", 700, 700);
+    auto* resolution_pad1 = new TProfile("resolution_p1", " ", 50, 5, 55);
+    auto* resolution_pad2 = new TProfile("resolution_p2", " ", 50, 5, 55);
 
     //----------------------------------------------------------------------------
     // Preparation of the particle trajectory:

@@ -38,10 +38,10 @@ int main(int argc, char* argv[]) {
     TFile* out = TFile::Open("datura-plane-distance.root", "RECREATE");
     gDirectory->pwd();
 
-    TCanvas* c1 = new TCanvas("c1", "resolution", 700, 700);
-    TGraph* resolution = new TGraph(130);
+    auto* c1 = new TCanvas("c1", "resolution", 700, 700);
+    auto* resolution = new TGraph(130);
 
-    TGraph* resolution2 = new TGraph(130);
+    auto* resolution2 = new TGraph(130);
 
     //----------------------------------------------------------------------------
     // Preparation of the telescope and beam properties:
@@ -76,14 +76,14 @@ int main(int argc, char* argv[]) {
 
         // Upstream telescope arm:
         for(int i = 0; i < 3; i++) {
-            planes.push_back(plane(position, MIM26, true, RES));
+            planes.emplace_back(position, MIM26, true, RES);
             position += dist;
         }
 
         // Downstream telescope arm:
         position = 2 * dist + 2 * DUT_DIST;
         for(int i = 0; i < 3; i++) {
-            planes.push_back(plane(position, MIM26, true, RES));
+            planes.emplace_back(position, MIM26, true, RES);
             position += dist;
         }
 
@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
     resolution2->SetLineColor(kBlue + 1);
     resolution2->SetLineWidth(2);
 
-    TLegend* leg = new TLegend();
+    auto* leg = new TLegend();
     leg->SetX1NDC(0.52);
     leg->SetY1NDC(0.79);
     leg->SetX2NDC(0.795);

@@ -37,11 +37,11 @@ int main(int argc, char* argv[]) {
     TFile* out = TFile::Open("datura-kink-resolution.root", "RECREATE");
     gDirectory->pwd();
 
-    TCanvas* c1 = new TCanvas("c1", "resolution", 700, 700);
-    TProfile* resolution = new TProfile("resolution", " ", 16, 0, 160.);
+    auto* c1 = new TCanvas("c1", "resolution", 700, 700);
+    auto* resolution = new TProfile("resolution", " ", 16, 0, 160.);
 
-    TCanvas* c2 = new TCanvas("c2", "kink_resolution", 700, 700);
-    TProfile* kink_resolution = new TProfile("kink_resolution", " ", 16, 0, 160);
+    auto* c2 = new TCanvas("c2", "kink_resolution", 700, 700);
+    auto* kink_resolution = new TProfile("kink_resolution", " ", 16, 0, 160);
 
     //----------------------------------------------------------------------------
     // Preparation of the telescope and beam properties:
@@ -82,14 +82,14 @@ int main(int argc, char* argv[]) {
 
         // Upstream telescope arm:
         for(int i = 0; i < 3; i++) {
-            datura.push_back(plane(position, MIM26, true, RES));
+            datura.emplace_back(position, MIM26, true, RES);
             position += DIST_up;
         }
 
         // Downstream telescope arm:
         position = 2 * DIST_up + DUT_DIST_up + DUT_DIST_down;
         for(int i = 0; i < 3; i++) {
-            datura.push_back(plane(position, MIM26, true, RES));
+            datura.emplace_back(position, MIM26, true, RES);
             position += DIST_down;
         }
 
