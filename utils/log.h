@@ -15,7 +15,7 @@ typedef unsigned int DWORD;
 typedef unsigned int uint32_t;
 #include <Windows.h>
 #else
-#include <stdint.h>
+#include <cstdint>
 #include <sys/time.h>
 #endif // WIN32
 #endif // WIN32 && CINT
@@ -25,9 +25,9 @@ typedef unsigned int uint32_t;
 #endif // WIN32
 
 #include <cstdio>
+#include <cstring>
 #include <iomanip>
 #include <sstream>
-#include <string.h>
 
 namespace unilog {
 
@@ -49,9 +49,8 @@ namespace unilog {
         uniLog();
         virtual ~uniLog();
         std::ostringstream&
-        Get(TLogLevel level = logINFO, std::string file = "", std::string function = "", uint32_t line = 0);
+        Get(TLogLevel level = logINFO, const std::string& file = "", const std::string& function = "", uint32_t line = 0);
 
-    public:
         static TLogLevel& ReportingLevel();
         static std::string ToString(TLogLevel level);
         static TLogLevel FromString(const std::string& level);
@@ -60,12 +59,12 @@ namespace unilog {
         std::ostringstream os;
 
     private:
-        uniLog(const uniLog&);
-        uniLog& operator=(const uniLog&);
+        uniLog(const uniLog&) = delete;
+        uniLog& operator=(const uniLog&) = delete;
         std::string NowTime();
     };
 
-    template <typename T> uniLog<T>::uniLog() {}
+    template <typename T> uniLog<T>::uniLog() = default;
 
 #ifdef WIN32
 
@@ -85,7 +84,7 @@ namespace unilog {
 
     template <typename T> std::string uniLog<T>::NowTime() {
         char buffer[11];
-        time_t t;
+        time_t t = 0;
         time(&t);
         tm r = *localtime(&t);
         strftime(buffer, sizeof(buffer), "%X", localtime_r(&t, &r));
@@ -99,13 +98,15 @@ namespace unilog {
 #endif // WIN32
 
     template <typename T>
-    std::ostringstream& uniLog<T>::Get(TLogLevel level, std::string file, std::string function, uint32_t line) {
+    std::ostringstream&
+    uniLog<T>::Get(TLogLevel level, const std::string& file, const std::string& function, uint32_t line) {
         os << "[" << NowTime() << "] ";
         os << std::setw(8) << ToString(level) << ": ";
 
         // For debug levels we want also function name and line number printed:
-        if(level != logINFO && level != logRESULT && level != logWARNING)
+        if(level != logINFO && level != logRESULT && level != logWARNING) {
             os << "<" << file << "/" << function << ":L" << line << "> ";
+        }
 
         return os;
     }
@@ -127,26 +128,36 @@ namespace unilog {
     }
 
     template <typename T> TLogLevel uniLog<T>::FromString(const std::string& level) {
-        if(level == "DEBUG5")
+        if(level == "DEBUG5") {
             return logDEBUG5;
-        if(level == "DEBUG4")
+        }
+        if(level == "DEBUG4") {
             return logDEBUG4;
-        if(level == "DEBUG3")
+        }
+        if(level == "DEBUG3") {
             return logDEBUG3;
-        if(level == "DEBUG2")
+        }
+        if(level == "DEBUG2") {
             return logDEBUG2;
-        if(level == "DEBUG")
+        }
+        if(level == "DEBUG") {
             return logDEBUG;
-        if(level == "INFO")
+        }
+        if(level == "INFO") {
             return logINFO;
-        if(level == "WARNING")
+        }
+        if(level == "WARNING") {
             return logWARNING;
-        if(level == "ERROR")
+        }
+        if(level == "ERROR") {
             return logERROR;
-        if(level == "CRITICAL")
+        }
+        if(level == "CRITICAL") {
             return logCRITICAL;
-        if(level == "RESULT")
+        }
+        if(level == "RESULT") {
             return logRESULT;
+        }
         uniLog<T>().Get(logWARNING) << "Unknown logging level '" << level << "'. Using WARNING level as default.";
         return logWARNING;
     }
@@ -170,16 +181,18 @@ namespace unilog {
 
     inline void SetLogOutput::Output(const std::string& msg) {
         FILE* pStream = Stream();
-        if(!pStream)
+        if(pStream == nullptr) {
             return;
+        }
         // Check if duplication to stderr is needed:
-        if(Duplicate() && pStream != stderr)
+        if(Duplicate() && pStream != stderr) {
             fprintf(stderr, "%s", msg.c_str());
+        }
         fprintf(pStream, "%s", msg.c_str());
         fflush(pStream);
     }
 
-    typedef uniLog<SetLogOutput> Log;
+    using Log = uniLog<SetLogOutput>;
 
 #define __FILE_NAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
