@@ -73,13 +73,13 @@ namespace unilog {
     std::string uniLog<T>::NowTime(){
     const int MAX_LEN = 200;
     char buffer[MAX_LEN];
-    if (GetTimeFormatA(LOCALE_USER_DEFAULT, 0, 0, 
+    if (GetTimeFormatA(LOCALE_USER_DEFAULT, 0, 0,
             "HH':'mm':'ss", buffer, MAX_LEN) == 0)
         return "Error in NowTime()";
 
     char result[100] = {0};
     static DWORD first = GetTickCount();
-    std::sprintf(result, "%s.%03ld", buffer, static_cast<long>(GetTickCount() - first) % 1000); 
+    std::sprintf(result, "%s.%03ld", buffer, static_cast<long>(GetTickCount() - first) % 1000);
     return result;
 }
 
@@ -93,9 +93,9 @@ namespace unilog {
     tm r = * localtime(&t);
     strftime(buffer, sizeof(buffer), "%X", localtime_r(&t, &r));
     struct timeval tv;
-    gettimeofday(&tv, 0);
+    gettimeofday(&tv, nullptr);
     char result[100] = {0};
-    std::sprintf(result, "%s.%03ld", buffer, static_cast<long>(tv.tv_usec) / 1000); 
+    std::sprintf(result, "%s.%03ld", buffer, tv.tv_usec / 1000);
     return result;
   }
 
@@ -105,7 +105,7 @@ namespace unilog {
     std::ostringstream& uniLog<T>::Get(TLogLevel level, std::string file, std::string function, uint32_t line) {
     os << "[" << NowTime() << "] ";
     os << std::setw(8) << ToString(level) << ": ";
-    
+
     // For debug levels we want also function name and line number printed:
     if (level != logINFO && level != logRESULT && level != logWARNING)
       os << "<" << file << "/" << function << ":L" << line << "> ";
@@ -179,7 +179,7 @@ namespace unilog {
   }
 
   inline void SetLogOutput::Output(const std::string& msg)
-  {   
+  {
     FILE* pStream = Stream();
     if (!pStream)
       return;
@@ -196,7 +196,7 @@ typedef uniLog<SetLogOutput> Log;
 
 #define IFLOG(level)							\
   if (level > unilog::Log::ReportingLevel() || !unilog::SetLogOutput::Stream()) ; \
-  else 
+  else
 
 #define LOG(level)				\
   if (level > unilog::Log::ReportingLevel() || !unilog::SetLogOutput::Stream()) ; \
