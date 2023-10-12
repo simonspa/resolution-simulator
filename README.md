@@ -45,13 +45,13 @@ First, the dependencies need to be installed, namely ROOT, GBL and Eigen3.
   (from https://gitlab.desy.de/claus.kleinwort/general-broken-lines)
 
   ```
- git clone https://gitlab.desy.de/claus.kleinwort/general-broken-lines.git
- cd general-broken-lines/cpp/
- mkdir build
- cd build
- cmake ..
- make
- make install
+  git clone https://gitlab.desy.de/claus.kleinwort/general-broken-lines.git
+  cd general-broken-lines/cpp/
+  mkdir build
+  cd build
+  cmake ..
+  make
+  make install
   ```
 
 * Export the GBL library path:
