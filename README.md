@@ -42,14 +42,16 @@ First, the dependencies need to be installed, namely ROOT, GBL and Eigen3.
 * Install and source ROOT (from https://root.cern.ch/), either ROOT5 or ROOT6 will work fine.
 
 * Install GBL
-  (from https://www.wiki.terascale.de/index.php/GeneralBrokenLines)
+  (from https://gitlab.desy.de/claus.kleinwort/general-broken-lines)
 
   ```
-  git clone https://github.com/GeneralBrokenLines/GeneralBrokenLines.git GeneralBrokenLines
-  cd GeneralBrokenLines
-  mkdir build && cd build/
+  git clone https://gitlab.desy.de/claus.kleinwort/general-broken-lines.git
+  cd general-broken-lines/cpp/
+  mkdir build
+  cd build
   cmake ..
-  make && make install
+  make
+  make install
   ```
 
 * Export the GBL library path:
