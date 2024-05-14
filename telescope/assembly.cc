@@ -247,7 +247,7 @@ std::pair<double, double> telescope::getKinkResolutionXY(size_t plane) const {
         tr.getResults(static_cast<int>(m_listOfLabels.at(plane)), aCorr, aCov);
     }
     return std::make_pair(sqrt(aCov(5, 5) + aCov(7, 7) + 2 * aCov(5, 7)) * 1E6,
-                          sqrt(sqrt(aCov(6, 6) + aCov(8, 8) + 2 * aCov(6, 8)) * 1E6));
+                          sqrt(aCov(6, 6) + aCov(8, 8) + 2 * aCov(6, 8)) * 1E6);
 }
 
 double telescope::getKinkResolution(size_t plane) const {
