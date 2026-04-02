@@ -1,10 +1,8 @@
 ########################################################
 # CMake file for telescope resolution calculator
-CMAKE_MINIMUM_REQUIRED(VERSION 3.6.3 FATAL_ERROR)
-IF(COMMAND CMAKE_POLICY)
-  CMAKE_POLICY(SET CMP0003 NEW)
-  CMAKE_POLICY(SET CMP0048 NEW) # set project version
-ENDIF(COMMAND CMAKE_POLICY)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10 FATAL_ERROR)
+CMAKE_POLICY(SET CMP0003 NEW)
+CMAKE_POLICY(SET CMP0048 NEW) # set project version
 ########################################################
 
 # Project name
