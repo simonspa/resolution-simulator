@@ -23,7 +23,10 @@
 #define X0_Kapton 285.6
 
 // X0 PCB (FR4)
-// http://personalpages.to.infn.it/~tosello/EngMeet/ITSmat/SDD/SDD_G10FR4.html
+// https://www.to.infn.it/~tosello/EngMeet/ITSmat/SDD/SDD_G10FR4.html
 #define X0_PCB 167.608
 
+// Polystyrene w. density 1060 kg / m^3 -> 41.31 cm
+// https://pdg.lbl.gov/2026/AtomicNuclearProperties/HTML/polystyrene.html
+#define X0_PS 413.1
 #endif /* MATERIAL_H */
